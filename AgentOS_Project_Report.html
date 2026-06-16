@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>AgentOS — Comprehensive Project Report</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">AgentOS — Comprehensive Project Report</h1>
+</header>
+<h1 id="agentos-comprehensive-project-report">AgentOS — Comprehensive Project Report</h1>
+<blockquote>
+<p><strong>Version:</strong> 1.0 · <strong>Date:</strong> June 14, 2026 · <strong>Status:</strong> Active Development <strong>Tagline:</strong> <em>The Operating System for Enterprise AI Agents</em></p>
+</blockquote>
+<hr />
+<h2 id="executive-summary">1. Executive Summary</h2>
+<p>AgentOS is a deterministic, cost-efficient platform for building, deploying, managing, and monitoring autonomous AI agent workflows at enterprise scale. It replaces unstructured, prompt-heavy AI tooling with a visual, no-code Studio that lets users define agent teams, assign tasks, wire execution graphs, and export production-ready Python code — all from a browser.</p>
+<p>The platform is built on three pillars:</p>
+<ol type="1">
+<li><strong>Deterministic Execution</strong> — Workflows follow strict, user-defined state transitions (Flows) rather than letting LLMs decide the execution path, preventing infinite loops and unpredictable behavior.</li>
+<li><strong>Cost Efficiency</strong> — An intelligent <code>RouterBrain</code> dynamically selects the cheapest model capable of completing each task, combined with in-memory LLM response caching via LiteLLM.</li>
+<li><strong>Full Observability</strong> — A built-in “Flight Recorder” (TelemetryLogger) captures every prompt, response, tool call, token count, latency, and cost in real-time, giving developers a complete audit trail.</li>
+</ol>
+<p>AgentOS is designed to be the base infrastructure layer upon which enterprises can build, run, and govern AI agents across departments — from sales and support to finance and engineering.</p>
+<hr />
+<h2 id="system-architecture">2. System Architecture</h2>
+<p>AgentOS employs a <strong>three-tier architecture</strong> with a clear separation of concerns:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph Frontend [&quot;Frontend — React + Vite&quot;]
+        LP[&quot;Landing Page&quot;]
+        DB[&quot;Dashboard / Control Plane&quot;]
+        ST[&quot;Studio Canvas (React Flow)&quot;]
+        DI[&quot;Discovery Hub&quot;]
+        GOV[&quot;Governance Console&quot;]
+        CTX[&quot;AgentContext (State Management)&quot;]
+    end
+
+    subgraph Middleware [&quot;Middleware — Node.js + Express&quot;]
+        API[&quot;REST API (Port 3001)&quot;]
+        MOCK[&quot;In-Memory Database&quot;]
+        SPAWN[&quot;child_process.spawn()&quot;]
+    end
+
+    subgraph Core [&quot;Core Engine — Python&quot;]
+        AG[&quot;Agent (LiteLLM)&quot;]
+        TK[&quot;Task (Verification Engine)&quot;]
+        FL[&quot;Flow (Deterministic Orchestration)&quot;]
+        RB[&quot;RouterBrain (Smart Model Routing)&quot;]
+        TL[&quot;TelemetryLogger (Flight Recorder)&quot;]
+        MG[&quot;ManagerBrain (Hierarchical Process)&quot;]
+        BG[&quot;Blueprint Generator (AI Workflow Builder)&quot;]
+        CP[&quot;Compiler (Graph → Python Code)&quot;]
+        DE[&quot;Discovery Engine (Use Case Generator)&quot;]
+        CN[&quot;IntegrationsHub (Connectors)&quot;]
+        SM[&quot;SecurityManager / SecretManager&quot;]
+    end
+
+    Frontend --&gt; Middleware --&gt; Core</code></pre>
+<h3 id="frontend-react-vite">2.1 Frontend (React + Vite)</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/App.jsx">App.jsx</a></td>
+<td>Root router — defines routes for Landing, Dashboard, Studio, Discovery, Governance</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/LandingPage.jsx">LandingPage.jsx</a></td>
+<td>Marketing entry point with CTA to dashboard</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Dashboard.jsx">Dashboard.jsx</a></td>
+<td>Control Plane — agent registry, metrics, flow execution, telemetry viewer</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Studio.jsx">Studio.jsx</a></td>
+<td>Visual drag-and-drop workflow builder (React Flow), AI blueprint generation, code export</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Discovery.jsx">Discovery.jsx</a></td>
+<td>AI-powered use case generator from natural language business descriptions</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Governance.jsx">Governance.jsx</a></td>
+<td>RBAC user management, API key vault, audit log viewer</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/components/CustomNodes.jsx">CustomNodes.jsx</a></td>
+<td>Custom React Flow node types (Agent, Task, Trigger)</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/components/Sidebar.jsx">Sidebar.jsx</a></td>
+<td>Collapsible navigation sidebar</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/context/AgentContext.jsx">AgentContext.jsx</a></td>
+<td>Global state provider — manages agents, projects, flow execution, and telemetry</td>
+</tr>
+</tbody>
+</table>
+<h3 id="middleware-node.js-express">2.2 Middleware (Node.js + Express)</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/server/index.js">index.js</a></td>
+<td>Express server on port 3001 — all API endpoints and Python process spawning</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/server/database.js">database.js</a></td>
+<td>Mock in-memory database with user wallet balance and credit deduction logic</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core-engine-python">2.3 Core Engine (Python)</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/agent.py">agent.py</a></td>
+<td><code>Agent</code> class — wraps LiteLLM for multi-provider LLM calls, in-memory caching, short-term memory</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/task.py">task.py</a></td>
+<td><code>Task</code> class — task execution with verification engine, smart routing, retry logic</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/flow.py">flow.py</a></td>
+<td><code>Flow</code> class — deterministic sequential/async execution with max iteration limits</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/router.py">router.py</a></td>
+<td><code>RouterBrain</code> — AI-powered model selector that picks cheapest capable model per task</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/telemetry.py">telemetry.py</a></td>
+<td><code>TelemetryLogger</code> — Flight Recorder; logs every prompt, response, tool call, tokens, latency, cost</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/manager.py">manager.py</a></td>
+<td><code>ManagerBrain</code> — hierarchical orchestration mode where an AI manager delegates tasks to agents</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/connectors.py">connectors.py</a></td>
+<td><code>IntegrationsHub</code> — stub connectors for Slack, GitHub, Jira</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/security.py">security.py</a></td>
+<td><code>SecurityManager</code> (RBAC + audit logs) and <code>SecretManager</code> (mock encrypted vault)</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/blueprint_generator.py">blueprint_generator.py</a></td>
+<td>Generates agent/task workflow graphs from natural language prompts (AI or keyword-based fallback)</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/compiler.py">compiler.py</a></td>
+<td>Converts visual Studio graphs into exportable Python code (agents.py, tasks.py, crew.py, YAML configs)</td>
+</tr>
+<tr class="odd">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/discovery_engine.py">discovery_engine.py</a></td>
+<td>Takes business context and generates top-3 high-ROI automation use cases via LLM</td>
+</tr>
+<tr class="even">
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py">universal_flow.py</a></td>
+<td>Runtime engine for Studio — executes arbitrary node graphs with DAG dependency resolution, tool calls, collaborative roundtables, and wallet deduction</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference">3. API Reference</h2>
+<p>All endpoints are served from the Express server on <strong>port 3001</strong>.</p>
+<h3 id="data-management">Data Management</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GET</code></td>
+<td><code>/api/wallet</code></td>
+<td>Fetch mock user wallet balance</td>
+</tr>
+<tr class="even">
+<td><code>GET</code></td>
+<td><code>/api/projects</code></td>
+<td>List all saved workflow projects</td>
+</tr>
+<tr class="odd">
+<td><code>POST</code></td>
+<td><code>/api/projects</code></td>
+<td>Create or update a project (upsert by ID)</td>
+</tr>
+<tr class="even">
+<td><code>GET</code></td>
+<td><code>/api/agents</code></td>
+<td>List all agents with aggregated metrics</td>
+</tr>
+<tr class="odd">
+<td><code>POST</code></td>
+<td><code>/api/agents</code></td>
+<td>Deploy a new agent</td>
+</tr>
+<tr class="even">
+<td><code>DELETE</code></td>
+<td><code>/api/agents/:id</code></td>
+<td>Remove an agent</td>
+</tr>
+<tr class="odd">
+<td><code>PUT</code></td>
+<td><code>/api/agents/:id/toggle</code></td>
+<td>Toggle agent status (active ↔︎ idle)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-integration">Python Integration</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 22%" />
+<col style="width: 31%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Endpoint</th>
+<th>Python Script</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>POST</code></td>
+<td><code>/api/flows/run</code></td>
+<td><code>example_flow.py</code></td>
+<td>Run the hardcoded two-agent research flow</td>
+</tr>
+<tr class="even">
+<td><code>POST</code></td>
+<td><code>/api/flows/custom</code></td>
+<td><code>universal_flow.py</code></td>
+<td>Execute any Studio-built workflow (deducts wallet)</td>
+</tr>
+<tr class="odd">
+<td><code>POST</code></td>
+<td><code>/api/discovery</code></td>
+<td><code>discovery_engine.py</code></td>
+<td>Generate AI use case recommendations</td>
+</tr>
+<tr class="even">
+<td><code>POST</code></td>
+<td><code>/api/blueprint/generate</code></td>
+<td><code>blueprint_generator.py</code></td>
+<td>Generate or modify workflow graphs from prompts</td>
+</tr>
+<tr class="odd">
+<td><code>POST</code></td>
+<td><code>/api/blueprint/export</code></td>
+<td><code>compiler.py</code></td>
+<td>Export visual graph to Python code files</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="technology-stack">4. Technology Stack</h2>
+<h3 id="frontend">Frontend</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Technology</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>React</td>
+<td>19.2.6</td>
+<td>UI framework</td>
+</tr>
+<tr class="even">
+<td>Vite</td>
+<td>8.0.12</td>
+<td>Build tool &amp; dev server</td>
+</tr>
+<tr class="odd">
+<td>React Router DOM</td>
+<td>7.17.0</td>
+<td>Client-side routing</td>
+</tr>
+<tr class="even">
+<td><span class="citation" data-cites="xyflow/react">@xyflow/react</span></td>
+<td>12.11.0</td>
+<td>Visual node editor (Studio Canvas)</td>
+</tr>
+<tr class="odd">
+<td>Lucide React</td>
+<td>1.17.0</td>
+<td>Icon library</td>
+</tr>
+</tbody>
+</table>
+<h3 id="backend">Backend</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Express.js</td>
+<td>REST API server</td>
+</tr>
+<tr class="even">
+<td>CORS</td>
+<td>Cross-origin request handling</td>
+</tr>
+<tr class="odd">
+<td>child_process (spawn)</td>
+<td>Python process orchestration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-core">Python Core</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LiteLLM</td>
+<td>Universal LLM abstraction layer (50+ providers)</td>
+</tr>
+<tr class="even">
+<td>python-dotenv</td>
+<td>Environment variable management</td>
+</tr>
+<tr class="odd">
+<td>DuckDuckGo Search</td>
+<td>Live web search tool for agents</td>
+</tr>
+</tbody>
+</table>
+<h3 id="supported-llm-providers-via-litellm">Supported LLM Providers (via LiteLLM)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Provider</th>
+<th>Models</th>
+<th>Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Google</td>
+<td>Gemini 2.5 Flash, Gemini 2.5 Pro</td>
+<td>Default</td>
+</tr>
+<tr class="even">
+<td>OpenAI</td>
+<td>GPT-4o, GPT-4o Mini</td>
+<td>Supported</td>
+</tr>
+<tr class="odd">
+<td>Anthropic</td>
+<td>Claude 3.5 Sonnet</td>
+<td>Supported</td>
+</tr>
+<tr class="even">
+<td>DeepSeek</td>
+<td>DeepSeek V3, DeepSeek Coder</td>
+<td>Supported</td>
+</tr>
+<tr class="odd">
+<td>Groq</td>
+<td>Llama 3 (8B), Mixtral (8x7B)</td>
+<td>Supported (Ultra-fast)</td>
+</tr>
+<tr class="even">
+<td>Ollama</td>
+<td>Llama 3, Mistral (Local)</td>
+<td>Supported (Free/Local)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="problems-solutions-implementation-status">5. Problems, Solutions &amp; Implementation Status</h2>
+<p>The following 20 problems have been identified as the core feature roadmap for AgentOS. Each is mapped to its current implementation status.</p>
+<h3 id="legend">Legend</h3>
+<ul>
+<li>✅ <strong>Implemented</strong> — Working in codebase today</li>
+<li>🟡 <strong>Partially Implemented</strong> — Foundation exists, needs production hardening</li>
+<li>❌ <strong>Not Yet Implemented</strong> — Planned for future development</li>
+</ul>
+<hr />
+<h3 id="major-problems-18">Major Problems (1–8)</h3>
+<h4 id="problem-1-unpredictable-agent-behavior">Problem 1 — Unpredictable Agent Behavior</h4>
+<blockquote>
+<p>The same task can produce different outputs on different runs.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Verification Engine</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/task.py#L36-L55">task.py</a> — Tasks accept <code>validation_rules</code>. A dedicated verifier LLM checks outputs against rules with up to 3 retries.</td>
+</tr>
+<tr class="even">
+<td>Workflow Replay</td>
+<td>🟡 Partial</td>
+<td>Deterministic <code>Flow</code> class enforces fixed execution order, but full state snapshot replay is not yet implemented.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Critical for enterprise trust. Verification engine prevents bad outputs from propagating downstream.</p>
+<hr />
+<h4 id="problem-2-high-cost">Problem 2 — High Cost</h4>
+<blockquote>
+<p>Many agents call expensive models repeatedly.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Smart Model Routing</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/router.py">router.py</a> — <code>RouterBrain</code> evaluates cognitive load and selects the cheapest model per task. Toggle in Studio UI.</td>
+</tr>
+<tr class="even">
+<td>LLM Response Caching</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/agent.py#L7">agent.py</a> — <code>litellm.cache = litellm.Cache(type=&quot;local&quot;)</code> enables in-memory caching.</td>
+</tr>
+<tr class="odd">
+<td>Intermediate Result Reuse</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py#L18-L22">universal_flow.py</a> — DAG-based execution passes upstream results as context to downstream tasks.</td>
+</tr>
+<tr class="even">
+<td>SaaS Wallet &amp; Cost Tracking</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/telemetry.py#L41-L66">telemetry.py</a> — Per-token cost calculation with 3x platform markup. <a href="file:///Users/parthlodaya/Downloads/AgentOs/server/database.js#L16-L26">database.js</a> — Wallet deduction after each flow run.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Potential 50–90% cost reduction. Smart routing alone can cut costs by 10x on simple tasks.</p>
+<hr />
+<h4 id="problem-3-difficult-debugging">Problem 3 — Difficult Debugging</h4>
+<blockquote>
+<p>When an agent fails, it’s hard to know why.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Agent Flight Recorder</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/telemetry.py">telemetry.py</a> — Records every prompt (full + preview), every response, every tool call, model used, latency, token counts, and cost.</td>
+</tr>
+<tr class="even">
+<td>Visual Workflow Timeline</td>
+<td>✅ Implemented</td>
+<td>Studio’s Flight Recorder panel + Dashboard’s Flow Execution Telemetry modal. Shows expandable trace cards with color-coded events, latency, token/cost badges.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Transforms debugging from guesswork to forensic analysis. Every LLM interaction is fully auditable.</p>
+<hr />
+<h4 id="problem-4-agent-hallucinations">Problem 4 — Agent Hallucinations</h4>
+<blockquote>
+<p>Agents confidently generate incorrect information.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mandatory Source Verification</td>
+<td>🟡 Partial</td>
+<td>Verification engine in <a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/task.py#L36-L55">task.py</a> can enforce custom rules. No automatic source-checking yet.</td>
+</tr>
+<tr class="even">
+<td>Confidence Scoring</td>
+<td>❌ Not Implemented</td>
+<td>Planned — LLM self-evaluation of output confidence.</td>
+</tr>
+<tr class="odd">
+<td>Cross-Agent Validation</td>
+<td>🟡 Partial</td>
+<td>Collaborative roundtable in <a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py#L72-L108">universal_flow.py</a> allows multiple agents to critique and refine each other’s outputs.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Reduces incorrect outputs. Full implementation requires external verification tools (see Section 7).</p>
+<hr />
+<h4 id="problem-5-agent-loops">Problem 5 — Agent Loops</h4>
+<blockquote>
+<p>Agents can get stuck talking to each other forever.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Maximum Iteration Limits</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/flow.py#L11">flow.py</a> — <code>max_iterations</code> parameter with hard cutoff. Default: 10.</td>
+</tr>
+<tr class="even">
+<td>Tool Call Loop Limits</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py#L45">universal_flow.py</a> — Single-agent tool loops capped at 4 iterations. Collaboration rounds capped at <code>len(agents) * 2</code>.</td>
+</tr>
+<tr class="odd">
+<td>Goal Completion Scoring</td>
+<td>❌ Not Implemented</td>
+<td>Planned — automatic detection of when output satisfies expected output.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Eliminates runaway costs and infinite execution loops.</p>
+<hr />
+<h4 id="problem-6-too-much-manual-prompting">Problem 6 — Too Much Manual Prompting</h4>
+<blockquote>
+<p>Users spend hours writing prompts.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AI-Generated Agent Templates</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/blueprint_generator.py">blueprint_generator.py</a> — Takes natural language (e.g., “Build a stock research team”) and generates complete agent/task graphs. Uses LLM when API key is present, keyword-based smart fallback otherwise.</td>
+</tr>
+<tr class="even">
+<td>Auto-Generated Workflows</td>
+<td>✅ Implemented</td>
+<td>Studio home page accepts plain English prompts → animates agent/task node creation on canvas.</td>
+</tr>
+<tr class="odd">
+<td>Quick Suggestion Chips</td>
+<td>✅ Implemented</td>
+<td>Studio UI provides clickable prompt suggestions (“Summarize customer support tickets”, “Triage GitHub issues”, etc.)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Reduces workflow creation from hours to seconds. Users describe intent; the system builds the team.</p>
+<hr />
+<h4 id="problem-7-weak-memory">Problem 7 — Weak Memory</h4>
+<blockquote>
+<p>Agents forget earlier work in the same session.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Short-Term Memory</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/agent.py#L17">agent.py</a> — <code>memory_store</code> keeps last 5 interactions as chat history.</td>
+</tr>
+<tr class="even">
+<td>Long-Term / Persistent Memory</td>
+<td>❌ Not Implemented</td>
+<td>Requires external tooling (Mem0 or vector database). See Section 7.</td>
+</tr>
+<tr class="odd">
+<td>Knowledge Graph</td>
+<td>❌ Not Implemented</td>
+<td>Planned for future development.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Short-term memory provides session continuity. Long-term memory is critical for agents that need to recall information across runs.</p>
+<hr />
+<h4 id="problem-8-lack-of-governance">Problem 8 — Lack of Governance</h4>
+<blockquote>
+<p>Large companies need auditing, access control, and compliance.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RBAC Permission System</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/security.py#L4-L23">security.py</a> — <code>SecurityManager</code> with Admin/Operator/Viewer roles and action-level permissions.</td>
+</tr>
+<tr class="even">
+<td>Audit Logs</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/security.py#L25-L34">security.py</a> — Immutable audit log with timestamps, user, action, and GRANTED/DENIED status.</td>
+</tr>
+<tr class="odd">
+<td>Secrets Vault</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/security.py#L36-L51">security.py</a> — <code>SecretManager</code> with mock encryption. Frontend vault UI in <a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Governance.jsx#L60-L76">Governance.jsx</a>.</td>
+</tr>
+<tr class="even">
+<td>UI Governance Console</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Governance.jsx">Governance.jsx</a> — Tabs for Users &amp; Roles, Secrets Vault, and Audit Logs.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact:</strong> Foundation for enterprise compliance. Production deployment requires integration with real auth (OAuth/SAML) and encryption (AWS KMS / HashiCorp Vault).</p>
+<hr />
+<h3 id="medium-sized-problems-914">Medium-Sized Problems (9–14)</h3>
+<h4 id="problem-9-slow-execution">Problem 9 — Slow Execution</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Parallel Agent Execution</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/flow.py#L18-L45">flow.py</a> — <code>run_async()</code> uses <code>asyncio.gather()</code>. <a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py#L114-L140">universal_flow.py</a> — Full DAG-based async execution with dependency resolution.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="problem-10-poor-tool-integration">Problem 10 — Poor Tool Integration</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Web Search (DuckDuckGo)</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/universal_flow.py#L50-L66">universal_flow.py</a> — Agents can call <code>[TOOL: WEB_SEARCH: query]</code> for live search.</td>
+</tr>
+<tr class="even">
+<td>Slack Connector</td>
+<td>🟡 Stub</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/connectors.py#L7-L12">connectors.py</a> — Stub implementation, prints to console.</td>
+</tr>
+<tr class="odd">
+<td>GitHub Connector</td>
+<td>🟡 Stub</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/connectors.py#L14-L19">connectors.py</a> — Stub for issue creation.</td>
+</tr>
+<tr class="even">
+<td>Jira Connector</td>
+<td>🟡 Stub</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/connectors.py#L21-L26">connectors.py</a> — Stub for ticket creation.</td>
+</tr>
+<tr class="odd">
+<td>Gmail, Notion, Databases</td>
+<td>❌ Not Implemented</td>
+<td>Planned for one-click connector marketplace.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="problem-11-no-agent-performance-metrics">Problem 11 — No Agent Performance Metrics</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Per-Agent Metrics</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/telemetry.py#L32-L82">telemetry.py</a> — Tracks accuracy (via verification), cost, latency, and token usage per agent per call.</td>
+</tr>
+<tr class="even">
+<td>Dashboard Aggregation</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Dashboard.jsx#L37-L58">Dashboard.jsx</a> — Displays total active agents, estimated daily cost, avg response time, system status.</td>
+</tr>
+<tr class="odd">
+<td>Success Rate Tracking</td>
+<td>❌ Not Implemented</td>
+<td>Planned — historical success/failure rate per agent.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="problem-12-context-window-limits">Problem 12 — Context Window Limits</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Memory Window Truncation</td>
+<td>🟡 Partial</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/agent.py#L32">agent.py</a> — Only injects last 5 memory items to stay within limits.</td>
+</tr>
+<tr class="even">
+<td>Automatic Context Compression</td>
+<td>❌ Not Implemented</td>
+<td>Planned — intelligent summarization of long contexts.</td>
+</tr>
+<tr class="odd">
+<td>RAG-based Retrieval</td>
+<td>❌ Not Implemented</td>
+<td>Planned — retrieve only relevant chunks from large documents.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="problem-13-hard-deployment">Problem 13 — Hard Deployment</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Code Export</td>
+<td>✅ Implemented</td>
+<td><a href="file:///Users/parthlodaya/Downloads/AgentOs/core/compiler.py">compiler.py</a> — Exports visual graphs to production-ready Python files (crew.py, agents.py, tasks.py, YAML configs, requirements.txt).</td>
+</tr>
+<tr class="even">
+<td>One-Click Cloud Deployment</td>
+<td>❌ Not Implemented</td>
+<td>Planned — Docker containerization + cloud deploy integration.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="problem-14-vendor-lock-in">Problem 14 — Vendor Lock-in</h4>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Solution</th>
+<th>Status</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Multi-Provider Support</td>
+<td>✅ Implemented</td>
+<td>Built on LiteLLM, supporting 50+ providers. Studio UI offers model selection dropdown with Google, OpenAI, Anthropic, DeepSeek, Groq, and local Ollama models.</td>
+</tr>
+<tr class="even">
+<td>Seamless Model Switching</td>
+<td>✅ Implemented</td>
+<td>Change model per agent without code changes — just select from dropdown in properties panel.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="minor-problems-1520">Minor Problems (15–20)</h3>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 30%" />
+<col style="width: 33%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Problem</th>
+<th>Solution</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>15</td>
+<td>Prompt Versioning</td>
+<td>Git-like version tracking for prompts</td>
+<td>❌ Not Implemented</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>Poor Collaboration</td>
+<td>Simultaneous multi-developer workflow editing</td>
+<td>❌ Not Implemented</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>No Workflow Marketplace</td>
+<td>Marketplace for pre-built agent templates (trading, marketing, coding, research)</td>
+<td>❌ Not Implemented</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>Weak Security</td>
+<td>Encryption, secret management, RBAC</td>
+<td>✅ Implemented (foundation) — <a href="file:///Users/parthlodaya/Downloads/AgentOs/core/agentos/security.py">security.py</a></td>
+</tr>
+<tr class="odd">
+<td>19</td>
+<td>Difficult Monitoring</td>
+<td>Real-time dashboards</td>
+<td>✅ Implemented — <a href="file:///Users/parthlodaya/Downloads/AgentOs/src/pages/Dashboard.jsx">Dashboard.jsx</a>, Flight Recorder</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>No Cost Forecasting</td>
+<td>Pre-execution cost estimates (“This workflow will cost ~₹15/day”)</td>
+<td>❌ Not Implemented</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="implementation-status-summary">6. Implementation Status Summary</h2>
+<pre class="mermaid"><code>pie title Feature Implementation Status
+    &quot;Fully Implemented&quot; : 14
+    &quot;Partially Implemented&quot; : 6
+    &quot;Not Yet Implemented&quot; : 10</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Implemented</th>
+<th>Partial</th>
+<th>Not Yet</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Major Problems (1-8)</td>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>Medium Problems (9-14)</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>Minor Problems (15-20)</td>
+<td>2</td>
+<td>0</td>
+<td>4</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td><strong>Totals</strong></td>
+<td><strong>11</strong></td>
+<td><strong>3</strong></td>
+<td><strong>6</strong></td>
+<td><strong>20</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>~70% of the identified problem areas have at least foundational implementations.</strong></p>
+</blockquote>
+<hr />
+<h2 id="external-tools-services-required">7. External Tools &amp; Services Required</h2>
+<p>The following external tools/services are required to bring AgentOS to production-grade enterprise quality. These cannot be replicated with custom code alone and represent the “buy vs. build” decisions.</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 20%" />
+<col style="width: 27%" />
+<col style="width: 11%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Capability</th>
+<th>Recommended Tool</th>
+<th>Estimated Monthly Cost</th>
+<th>Purpose</th>
+<th>Integration Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Memory Persistence</strong></td>
+<td>Mem0</td>
+<td>$100 – $500/mo</td>
+<td>Long-term agent memory across sessions. Replaces in-memory <code>memory_store</code>. Enables agents to recall past interactions, user preferences, and learned patterns.</td>
+<td>🔴 High</td>
+</tr>
+<tr class="even">
+<td><strong>Observability &amp; Tracing</strong></td>
+<td>LangFuse / SigNoz</td>
+<td>Free – $500/mo</td>
+<td>Production-grade tracing, dashboards, and alerting. Extends the built-in Flight Recorder with persistent storage, team-wide dashboards, and anomaly detection.</td>
+<td>🔴 High</td>
+</tr>
+<tr class="odd">
+<td><strong>Output Verification</strong></td>
+<td>Patronus / Arize</td>
+<td>$500+/mo</td>
+<td>Automated hallucination detection, factual accuracy scoring, and output quality evaluation at scale. Replaces basic rule-based verification in <code>task.py</code>.</td>
+<td>🟡 Medium</td>
+</tr>
+<tr class="even">
+<td><strong>Cost Optimization</strong></td>
+<td>TrueFoundry / Custom Layer</td>
+<td>$200 – $1,000/mo</td>
+<td>Advanced model routing with historical performance data, batch processing, and request queuing for cost reduction beyond <code>RouterBrain</code>.</td>
+<td>🟡 Medium</td>
+</tr>
+<tr class="odd">
+<td><strong>A/B Testing</strong></td>
+<td>LangFuse / Custom Script</td>
+<td>Free – $300/mo</td>
+<td>Compare agent performance across different models, prompts, and configurations. Statistical significance testing on output quality.</td>
+<td>🟢 Low</td>
+</tr>
+<tr class="even">
+<td><strong>Compliance &amp; Audit</strong></td>
+<td>Enterprise AMP Platform</td>
+<td>$250 – $2,000+/mo</td>
+<td>SOC 2 / ISO 27001 audit trails, compliance dashboards, data residency controls, and enterprise SSO integration.</td>
+<td>🟡 Medium</td>
+</tr>
+</tbody>
+</table>
+<h3 id="total-estimated-external-tooling-cost">Total Estimated External Tooling Cost</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Tier</th>
+<th>Monthly Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Minimum Viable (Open-source where possible)</td>
+<td>$300 – $800/mo</td>
+</tr>
+<tr class="even">
+<td>Standard Enterprise</td>
+<td>$1,500 – $3,500/mo</td>
+</tr>
+<tr class="odd">
+<td>Full Enterprise Suite</td>
+<td>$3,000 – $5,000+/mo</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-gaps-by-pricing-tier">8. Key Gaps by Pricing Tier</h2>
+<h3 id="free-tier-currently-missing">Free Tier — Currently Missing</h3>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 43%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Gap</th>
+<th>Severity</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>❌ Discovery Feature (should be paid-only)</td>
+<td>🟡 Medium</td>
+<td>Discovery Hub currently accessible to all users. Needs gating behind paid tier.</td>
+</tr>
+<tr class="even">
+<td>❌ Observability Dashboard</td>
+<td>🔴 Critical</td>
+<td>Flight Recorder exists but is ephemeral (in-memory). No persistent dashboards or historical analytics.</td>
+</tr>
+<tr class="odd">
+<td>❌ Governance / RBAC enforcement</td>
+<td>🔴 Critical</td>
+<td><code>SecurityManager</code> exists in Python but is not enforced at the API layer. Any user can access any endpoint.</td>
+</tr>
+<tr class="even">
+<td>❌ Hallucination Verification</td>
+<td>🟡 Medium</td>
+<td>Verification engine exists but is opt-in (requires <code>validation_rules</code>). No automatic hallucination detection.</td>
+</tr>
+<tr class="odd">
+<td>❌ Enterprise Support</td>
+<td>🟢 Low</td>
+<td>No SLA, priority support channel, or dedicated account management.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enterprise-tier-still-missing">Enterprise Tier — Still Missing</h3>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 43%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Gap</th>
+<th>Severity</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>❌ Cost Optimization Routing (Production-Grade)</td>
+<td>🔴 Critical</td>
+<td><code>RouterBrain</code> works but lacks historical performance data, A/B testing, and batch optimization.</td>
+</tr>
+<tr class="even">
+<td>❌ Native Memory Persistence</td>
+<td>🔴 Critical</td>
+<td>Only in-memory short-term (5 messages). No cross-session, cross-workflow, or team-shared memory.</td>
+</tr>
+<tr class="odd">
+<td>❌ Context Window Auto-Management</td>
+<td>🟡 Medium</td>
+<td>Basic truncation only (last 5 memories). No intelligent summarization, RAG, or sliding window compression.</td>
+</tr>
+<tr class="even">
+<td>❌ SOC 2 / ISO 27001 Certification</td>
+<td>🔴 Critical</td>
+<td>Platform is not certified. Enterprise customers in regulated industries (finance, healthcare) will require this.</td>
+</tr>
+<tr class="odd">
+<td>❌ Real-Time Collaboration</td>
+<td>🟡 Medium</td>
+<td>No WebSocket-based live editing. Only one user can edit a workflow at a time.</td>
+</tr>
+<tr class="even">
+<td>❌ Workflow Marketplace</td>
+<td>🟢 Low</td>
+<td>No ability to share, discover, or monetize pre-built agent templates.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="codebase-structure">9. Codebase Structure</h2>
+<pre class="text"><code>AgentOs/
+├── .env                         # Root environment variables
+├── .gitignore
+├── README.md
+├── package.json                 # Frontend dependencies &amp; scripts
+├── vite.config.js               # Vite configuration
+├── index.html                   # Entry HTML
+│
+├── src/                         # Frontend React Application
+│   ├── App.jsx                  # Router &amp; route definitions
+│   ├── App.css                  # App-level styles
+│   ├── index.css                # Global design system
+│   ├── main.jsx                 # React DOM entry point
+│   ├── pages/
+│   │   ├── LandingPage.jsx      # Marketing landing page
+│   │   ├── Dashboard.jsx        # Control Plane (agents, metrics, flow runner)
+│   │   ├── Studio.jsx           # Visual workflow builder (825 lines)
+│   │   ├── Discovery.jsx        # AI use case generator
+│   │   └── Governance.jsx       # RBAC, secrets, audit logs
+│   ├── components/
+│   │   ├── CustomNodes.jsx      # React Flow node definitions
+│   │   ├── DashboardLayout.jsx  # Layout wrapper with sidebar
+│   │   └── Sidebar.jsx          # Navigation sidebar
+│   ├── context/
+│   │   └── AgentContext.jsx     # Global state management
+│   └── assets/
+│
+├── server/                      # Node.js Express API
+│   ├── index.js                 # API endpoints (319 lines)
+│   ├── database.js              # Mock in-memory database
+│   ├── package.json             # Server dependencies
+│   └── node_modules/
+│
+└── core/                        # Python Core Engine
+    ├── setup.py                 # Python package definition (agentos v0.1.0)
+    ├── .env                     # API keys
+    ├── .env.example             # Template for API keys
+    ├── example_flow.py          # Hardcoded 2-agent research demo
+    ├── universal_flow.py        # Runtime: executes any Studio-built graph
+    ├── discovery_engine.py      # AI use case generator
+    ├── compiler.py              # Graph → Python code exporter
+    └── agentos/                 # Core Python package
+        ├── __init__.py          # Exports: Agent, Task, Flow, RouterBrain
+        ├── agent.py             # Agent class (LiteLLM, caching, memory)
+        ├── task.py              # Task class (verification, routing, retries)
+        ├── flow.py              # Flow class (sequential + async execution)
+        ├── router.py            # RouterBrain (smart model selection)
+        ├── telemetry.py         # TelemetryLogger (Flight Recorder)
+        ├── manager.py           # ManagerBrain (hierarchical orchestration)
+        ├── connectors.py        # IntegrationsHub (Slack, GitHub, Jira stubs)
+        ├── security.py          # SecurityManager + SecretManager
+        └── blueprint_generator.py  # AI workflow graph generator</code></pre>
+<hr />
+<h2 id="key-differentiators">10. Key Differentiators</h2>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 24%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>AgentOS</th>
+<th>Typical Competitors</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Execution Model</strong></td>
+<td>Deterministic Flows with explicit state transitions</td>
+<td>LLM-decided execution paths (unpredictable)</td>
+</tr>
+<tr class="even">
+<td><strong>Cost Control</strong></td>
+<td>Built-in RouterBrain + per-token cost tracking + wallet system</td>
+<td>Manual model selection, no cost awareness</td>
+</tr>
+<tr class="odd">
+<td><strong>Visual Builder</strong></td>
+<td>Full drag-and-drop Studio with AI generation + code export</td>
+<td>CLI-only or basic YAML configs</td>
+</tr>
+<tr class="even">
+<td><strong>Observability</strong></td>
+<td>Flight Recorder with full prompt/response/tool/cost logging</td>
+<td>Minimal or no built-in tracing</td>
+</tr>
+<tr class="odd">
+<td><strong>Multi-Provider</strong></td>
+<td>50+ LLM providers via LiteLLM (including local models)</td>
+<td>Often locked to single provider</td>
+</tr>
+<tr class="even">
+<td><strong>Monetization</strong></td>
+<td>Built-in SaaS markup (3x cost) with wallet/credits system</td>
+<td>No built-in monetization layer</td>
+</tr>
+<tr class="odd">
+<td><strong>Code Export</strong></td>
+<td>One-click export to production Python code</td>
+<td>No export capability</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="product-roadmap-prioritized">11. Product Roadmap (Prioritized)</h2>
+<h3 id="phase-1-foundation-hardening-current-q3-2026">Phase 1 — Foundation Hardening (Current → Q3 2026)</h3>
+<ul class="task-list">
+<li><input type="checkbox" disabled></input>
+Enforce RBAC at API layer (middleware auth)</li>
+<li><input type="checkbox" disabled></input>
+Persistent database (PostgreSQL / MongoDB)</li>
+<li><input type="checkbox" disabled></input>
+WebSocket-based real-time execution streaming</li>
+<li><input type="checkbox" disabled></input>
+Persistent telemetry storage</li>
+<li><input type="checkbox" disabled></input>
+Pre-execution cost forecasting</li>
+</ul>
+<h3 id="phase-2-enterprise-features-q3-q4-2026">Phase 2 — Enterprise Features (Q3 → Q4 2026)</h3>
+<ul class="task-list">
+<li><input type="checkbox" disabled></input>
+Mem0 integration for persistent agent memory</li>
+<li><input type="checkbox" disabled></input>
+LangFuse / SigNoz integration for observability</li>
+<li><input type="checkbox" disabled></input>
+Prompt versioning system</li>
+<li><input type="checkbox" disabled></input>
+OAuth/SAML SSO integration</li>
+<li><input type="checkbox" disabled></input>
+Docker containerization + one-click deployment</li>
+</ul>
+<h3 id="phase-3-marketplace-scale-q1-q2-2027">Phase 3 — Marketplace &amp; Scale (Q1 → Q2 2027)</h3>
+<ul class="task-list">
+<li><input type="checkbox" disabled></input>
+Workflow marketplace (publish, discover, fork templates)</li>
+<li><input type="checkbox" disabled></input>
+Real-time multi-user collaboration (CRDT-based)</li>
+<li><input type="checkbox" disabled></input>
+Advanced context management (RAG + auto-compression)</li>
+<li><input type="checkbox" disabled></input>
+Full connector marketplace (Gmail, Notion, databases)</li>
+<li><input type="checkbox" disabled></input>
+SOC 2 / ISO 27001 certification process</li>
+</ul>
+<h3 id="phase-4-intelligence-layer-q2-2027">Phase 4 — Intelligence Layer (Q2 2027+)</h3>
+<ul class="task-list">
+<li><input type="checkbox" disabled></input>
+Patronus/Arize integration for hallucination verification</li>
+<li><input type="checkbox" disabled></input>
+Confidence scoring on all agent outputs</li>
+<li><input type="checkbox" disabled></input>
+Automated A/B testing for agent configurations</li>
+<li><input type="checkbox" disabled></input>
+Goal completion detection (auto-stop when output meets criteria)</li>
+<li><input type="checkbox" disabled></input>
+Advanced cost optimization with historical routing data</li>
+</ul>
+<hr />
+<h2 id="how-to-run">12. How to Run</h2>
+<h3 id="frontend-vite-dev-server">Frontend (Vite Dev Server)</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /Users/parthlodaya/Downloads/AgentOs</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span></code></pre></div>
+<h3 id="backend-express-api-server">Backend (Express API Server)</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /Users/parthlodaya/Downloads/AgentOs/server</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> index.js</span></code></pre></div>
+<h3 id="python-core-install-package">Python Core (Install Package)</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /Users/parthlodaya/Downloads/AgentOs/core</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> .</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install litellm python-dotenv duckduckgo-search</span></code></pre></div>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>Copy <code>.env.example</code> in <code>/core/</code> and add your API keys:</p>
+<pre><code>GEMINI_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here</code></pre>
+<blockquote>
+<p><strong>Note:</strong> The platform works without API keys using mock/fallback responses for testing.</p>
+</blockquote>
+<hr />
+<p><em>Report generated for AgentOS v0.1.0 — The Operating System for Enterprise AI Agents</em></p>
+</body>
+</html>

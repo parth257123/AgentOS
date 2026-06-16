@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS Web Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Telemetry -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <div class="glow-orb"></div>
+                <h1>AgentOS</h1>
+            </div>
+            
+            <div class="telemetry-section">
+                <h2>Live Telemetry</h2>
+                
+                <!-- Context Health Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span>Context Health</span>
+                        <span id="health-status" class="status-badge healthy">HEALTHY</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="health-bar" class="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    <div class="widget-footer">
+                        <span id="health-percent">0%</span>
+                        <span id="token-count">0 Tokens</span>
+                    </div>
+                </div>
+
+                <!-- Cost Prediction Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span>Session Cost</span>
+                        <span class="status-badge neutral">Live</span>
+                    </div>
+                    <div class="cost-display">
+                        $<span id="total-cost">0.000000</span>
+                    </div>
+                    <div class="widget-footer">
+                        <span>Budget Cap: $10.00</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container glass-panel">
+            <div class="chat-header">
+                <h2>Mesh Terminal</h2>
+                <span class="pulse-indicator"></span>
+            </div>
+            
+            <div id="chat-history" class="chat-history">
+                <div class="message system-message">
+                    <div class="message-content">
+                        Welcome to AgentOS. The Mesh is online and awaiting instructions.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <form id="chat-form">
+                    <input type="text" id="prompt-input" placeholder="Assign a task to the Mesh..." autocomplete="off">
+                    <button type="submit" id="send-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>

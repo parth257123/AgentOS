@@ -1,0 +1,31 @@
+{
+  "prompt": "Test the mesh.",
+  "nodes": [
+    {
+      "id": "agent-1",
+      "type": "agent",
+      "data": {
+        "name": "Manager",
+        "role": "Coordinator",
+        "goal": "Manage",
+        "backstory": "You manage things."
+      }
+    },
+    {
+      "id": "agent-2",
+      "type": "agent",
+      "data": {
+        "name": "Worker",
+        "role": "Executor",
+        "goal": "Execute",
+        "backstory": "You do things."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "agent-1",
+      "target": "agent-2"
+    }
+  ]
+}

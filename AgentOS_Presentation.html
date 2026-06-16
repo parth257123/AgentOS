@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS — The Operating System for Enterprise AI Agents</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.2.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.2.0/theme/black.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        :root {
+            --accent: #6C5CE7;
+            --accent-light: #A29BFE;
+            --accent2: #00B4D8;
+            --bg: #0B0D17;
+            --bg-card: rgba(255,255,255,0.035);
+            --border: rgba(255,255,255,0.06);
+            --text: #E2E4EA;
+            --text-dim: #7B8399;
+            --green: #34D399;
+            --yellow: #FBBF24;
+            --red: #F87171;
+            --grad: linear-gradient(135deg, #6C5CE7, #00B4D8);
+        }
+
+        .reveal {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal .slides section {
+            box-sizing: border-box;
+            padding: 48px 56px 40px;
+            height: 720px;
+            width: 1280px;
+            overflow: hidden;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            font-family: 'Inter', sans-serif;
+            text-transform: none;
+            letter-spacing: -0.025em;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .reveal h2 { font-size: 1.65em; margin-bottom: 20px; color: #fff; }
+        .reveal h3 { font-size: 0.9em; font-weight: 700; color: var(--accent-light); margin-bottom: 8px; }
+        .reveal h4 { font-size: 0.78em; font-weight: 700; color: #fff; margin: 0 0 4px; }
+
+        .reveal p { font-size: 0.72em; color: var(--text-dim); line-height: 1.55; margin: 0; }
+        .reveal li { font-size: 0.72em; color: var(--text-dim); line-height: 1.5; }
+
+        .reveal ul { margin: 0; padding-left: 16px; }
+
+        .grad-text {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== PILL / LABEL ===== */
+        .label {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 0.55em;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            background: rgba(108,92,231,0.12);
+            color: var(--accent-light);
+            border: 1px solid rgba(108,92,231,0.2);
+        }
+
+        .label-green { background: rgba(52,211,153,0.1); color: var(--green); border-color: rgba(52,211,153,0.2); }
+        .label-orange { background: rgba(251,191,36,0.1); color: var(--yellow); border-color: rgba(251,191,36,0.2); }
+        .label-blue { background: rgba(0,180,216,0.1); color: var(--accent2); border-color: rgba(0,180,216,0.2); }
+
+        /* ===== CARDS ===== */
+        .grid { display: grid; gap: 14px; }
+        .g2 { grid-template-columns: 1fr 1fr; }
+        .g3 { grid-template-columns: 1fr 1fr 1fr; }
+        .g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover { border-color: rgba(108,92,231,0.25); }
+
+        .card-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7em; font-weight: 800; color: #fff;
+            margin-bottom: 10px;
+            background: var(--grad);
+        }
+
+        .card h4 { margin-bottom: 5px; }
+        .card p { font-size: 0.65em !important; }
+
+        /* ===== TABLES ===== */
+        .reveal table {
+            width: 100%; font-size: 0.62em;
+            border-collapse: separate; border-spacing: 0;
+            background: var(--bg-card);
+            border-radius: 8px; overflow: hidden;
+        }
+
+        .reveal table th {
+            background: rgba(108,92,231,0.1);
+            color: var(--accent-light); font-weight: 600;
+            padding: 10px 14px; text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .reveal table td {
+            padding: 8px 14px; color: var(--text-dim);
+            border-bottom: 1px solid rgba(255,255,255,0.025);
+        }
+
+        .reveal table tr:last-child td { border-bottom: none; }
+
+        /* ===== STATUS BADGES ===== */
+        .badge {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 4px; font-size: 0.85em; font-weight: 600;
+        }
+        .b-done { background: rgba(52,211,153,0.12); color: var(--green); }
+        .b-partial { background: rgba(251,191,36,0.12); color: var(--yellow); }
+        .b-planned { background: rgba(248,113,113,0.12); color: var(--red); }
+
+        /* ===== TITLE SLIDE ===== */
+        .title-slide {
+            text-align: center !important;
+            display: flex !important; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        .logo-icon {
+            width: 72px; height: 72px;
+            background: var(--grad);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8em; font-weight: 900; color: #fff;
+            margin-bottom: 24px;
+            box-shadow: 0 0 40px rgba(108,92,231,0.25);
+        }
+
+        .title-slide h1 {
+            font-size: 3em;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.1em; color: var(--text-dim);
+            font-weight: 300; margin-bottom: 32px;
+        }
+
+        .title-pills { display: flex; gap: 10px; }
+
+        .title-slide .meta {
+            font-size: 0.65em; color: #444; margin-top: 36px;
+        }
+
+        /* ===== ARCHITECTURE ===== */
+        .arch { display: flex; gap: 12px; align-items: stretch; }
+
+        .arch-col {
+            flex: 1; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 16px;
+        }
+
+        .arch-col h4 { font-size: 0.72em; margin-bottom: 2px; }
+        .arch-col .tech-label { font-size: 0.55em; color: var(--accent-light); font-weight: 500; margin-bottom: 10px; }
+
+        .arch-mod {
+            background: rgba(255,255,255,0.04);
+            border-left: 2px solid var(--accent);
+            border-radius: 0 6px 6px 0;
+            padding: 5px 10px; margin: 4px 0;
+            font-size: 0.6em; color: var(--text-dim);
+        }
+
+        .arch-arrow {
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-light); font-size: 1.2em; padding: 0 2px;
+            flex-shrink: 0;
+        }
+
+        /* ===== TIMELINE ===== */
+        .tl { position: relative; padding-left: 20px; }
+
+        .tl::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 2px; background: var(--grad); border-radius: 2px;
+        }
+
+        .tl-item { position: relative; padding-left: 18px; margin-bottom: 16px; }
+
+        .tl-item::before {
+            content: ''; position: absolute; left: -24px; top: 4px;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); border: 2px solid var(--bg);
+            box-shadow: 0 0 8px rgba(108,92,231,0.4);
+        }
+
+        .tl-phase { font-size: 0.55em; font-weight: 700; color: var(--accent-light); text-transform: uppercase; letter-spacing: 0.06em; }
+        .tl-title { font-size: 0.78em; font-weight: 700; color: #fff; margin: 2px 0 4px; }
+        .tl-list { list-style: none; padding: 0; margin: 0; }
+        .tl-list li { font-size: 0.6em !important; padding: 1px 0; color: var(--text-dim); }
+        .tl-list li::before { content: '→ '; color: var(--accent); }
+
+        /* ===== PRICING ===== */
+        .pricing { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+        .price-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 24px 20px; text-align: center;
+        }
+
+        .price-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 0 24px rgba(108,92,231,0.15);
+            transform: scale(1.03);
+        }
+
+        .price-card h4 { font-size: 0.85em; color: #fff; margin-bottom: 4px; }
+        .price-amount {
+            font-size: 1.6em; font-weight: 900; color: var(--accent-light);
+            margin: 8px 0 4px;
+        }
+        .price-desc { font-size: 0.58em !important; color: var(--text-dim); margin-bottom: 12px; }
+
+        .price-card ul { list-style: none; padding: 0; margin: 0; text-align: left; }
+        .price-card li {
+            font-size: 0.58em !important; padding: 3px 0 3px 14px;
+            position: relative; color: var(--text-dim);
+        }
+        .price-card li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+
+        /* ===== FLOW DIAGRAM ===== */
+        .flow-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        .flow-box {
+            background: var(--bg-card); border: 1px solid rgba(108,92,231,0.25);
+            border-radius: 8px; padding: 10px 16px; text-align: center; min-width: 120px;
+        }
+
+        .flow-box strong { font-size: 0.7em; color: #fff; display: block; }
+        .flow-box span { font-size: 0.55em; color: var(--text-dim); }
+        .flow-arr { color: var(--accent-light); font-size: 0.9em; flex-shrink: 0; }
+
+        /* ===== TWO COL ===== */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+        /* ===== CLEAN LIST ===== */
+        .cl { list-style: none; padding: 0; margin: 0; }
+        .cl li { padding: 4px 0 4px 16px; position: relative; font-size: 0.68em !important; color: var(--text-dim); }
+        .cl li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+        /* ===== QUOTE ===== */
+        .quote {
+            border-left: 3px solid var(--accent); padding: 12px 20px;
+            background: var(--bg-card); border-radius: 0 8px 8px 0; margin: 12px 0;
+        }
+        .quote p { font-size: 0.78em !important; color: var(--text) !important; font-style: italic; }
+
+        /* ===== HIGHLIGHT BOX ===== */
+        .highlight {
+            background: rgba(108,92,231,0.06); border: 1px solid rgba(108,92,231,0.15);
+            border-radius: 8px; padding: 12px 20px; text-align: center;
+        }
+        .highlight p { color: var(--text) !important; font-size: 0.68em !important; }
+
+        /* ===== STAT ===== */
+        .stat-val {
+            font-size: 2em; font-weight: 900; line-height: 1.1;
+            background: var(--grad); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .stat-label { font-size: 0.58em !important; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+        /* ===== CTA ===== */
+        .cta-slide { text-align: center !important; display: flex !important; flex-direction: column; align-items: center; justify-content: center; }
+
+        .cta-btn {
+            display: inline-block; padding: 14px 42px;
+            background: var(--grad); border-radius: 100px;
+            font-size: 0.82em; font-weight: 700; color: #fff;
+            text-decoration: none; margin-top: 20px;
+            box-shadow: 0 0 24px rgba(108,92,231,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cta-btn:hover { transform: scale(1.04); box-shadow: 0 0 40px rgba(108,92,231,0.35); }
+
+        /* ===== PROGRESS BAR ===== */
+        .reveal .progress { background: rgba(108,92,231,0.1); height: 3px; }
+        .reveal .progress span { background: var(--grad); }
+
+        /* ===== SECTION DIVIDER ===== */
+        .divider-slide {
+            text-align: center !important;
+            display: flex !important; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .divider-slide h2 { font-size: 2.4em; margin-bottom: 12px; }
+        .divider-slide p { font-size: 0.95em; max-width: 550px; text-align: center; }
+
+        /* ===== SLIDE NUMBER ===== */
+        .reveal .slide-number { font-family: 'Inter', sans-serif; font-size: 12px; color: #444; }
+
+        /* ===== CONTROLS ===== */
+        .reveal .controls button { color: var(--accent); }
+
+        /* ===== FIX BACKGROUNDS ===== */
+        .reveal .slide-background { background: var(--bg) !important; }
+
+        /* ===== TECH GRID ===== */
+        .tech-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 14px; background: var(--bg-card);
+            border-radius: 8px; border: 1px solid var(--border);
+        }
+        .tech-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); flex-shrink: 0;
+        }
+        .tech-name { font-size: 0.7em; font-weight: 600; color: #fff; }
+        .tech-desc { font-size: 0.58em; color: var(--text-dim); margin-left: auto; }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ==================== SLIDE 1: TITLE ==================== -->
+<section class="title-slide" data-background-color="#0B0D17">
+    <div class="logo-icon">A</div>
+    <h1>AgentOS</h1>
+    <p class="subtitle">The Operating System for Enterprise AI Agents</p>
+    <div class="title-pills">
+        <span class="label">Build</span>
+        <span class="label-green label">Deploy</span>
+        <span class="label-blue label">Monitor</span>
+        <span class="label-orange label">Govern</span>
+    </div>
+    <p class="meta">Version 1.0 &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; Confidential</p>
+</section>
+
+<!-- ==================== SLIDE 2: THE PROBLEM ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-orange">Industry Challenge</span>
+    <h2>Enterprise AI Agents Are <span class="grad-text">Fundamentally Broken</span></h2>
+
+    <div class="grid g3" style="margin-top: 16px;">
+        <div class="card">
+            <div class="card-icon">01</div>
+            <h4>Non-Deterministic Output</h4>
+            <p>Same task, different results on every run. Enterprises cannot trust unpredictable systems in production.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">02</div>
+            <h4>Uncontrolled Costs</h4>
+            <p>Teams burn API budgets calling GPT-4 for tasks a $0.001/call model could handle. No cost visibility.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">03</div>
+            <h4>Zero Observability</h4>
+            <p>When agents fail, no one knows why. No tracing, no audit trail, no forensic debugging capability.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">04</div>
+            <h4>Infinite Loop Risk</h4>
+            <p>Agents get stuck in endless cycles, running up costs with no output and no automatic termination.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">05</div>
+            <h4>Manual Configuration</h4>
+            <p>Hours spent hand-writing prompts. No visual tools, no templates, no reusable workflow patterns.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">06</div>
+            <h4>No Governance</h4>
+            <p>No RBAC, no audit logs, no compliance framework. Enterprise deployment is simply not possible.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 3: SOLUTION ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label">Our Solution</span>
+    <h2>Introducing <span class="grad-text">AgentOS</span></h2>
+
+    <div class="quote">
+        <p>A deterministic, cost-efficient platform for building, deploying, managing, and monitoring autonomous AI agent workflows at enterprise scale.</p>
+    </div>
+
+    <div class="grid g3" style="margin-top: 16px;">
+        <div class="card" style="text-align: center; padding: 24px 18px;">
+            <div class="card-icon" style="margin: 0 auto 10px;">D</div>
+            <h4>Deterministic Execution</h4>
+            <p>Workflows follow strict, user-defined state transitions — never LLM-decided paths.</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 24px 18px;">
+            <div class="card-icon" style="margin: 0 auto 10px; background: linear-gradient(135deg, #34D399, #00B4D8);">$</div>
+            <h4>Cost Efficiency</h4>
+            <p>RouterBrain selects the cheapest capable model per task. Cut API costs by up to 10×.</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 24px 18px;">
+            <div class="card-icon" style="margin: 0 auto 10px; background: linear-gradient(135deg, #00B4D8, #0077B6);">O</div>
+            <h4>Full Observability</h4>
+            <p>Flight Recorder captures every prompt, response, tool call, token count, latency, and cost.</p>
+        </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 16px;">
+        <p><strong>Vision:</strong> AgentOS is the infrastructure layer upon which enterprises build, run, and govern AI agents across every department.</p>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 4: PLATFORM MODULES ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-blue">Platform Overview</span>
+    <h2>Five Integrated <span class="grad-text">Modules</span></h2>
+
+    <div class="grid g3" style="margin-top: 14px;">
+        <div class="card">
+            <div class="card-icon">L</div>
+            <h4>Landing Page</h4>
+            <p>Marketing entry point with product positioning, feature highlights, and platform CTAs.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #00B4D8, #0077B6);">D</div>
+            <h4>Dashboard &amp; Control Plane</h4>
+            <p>Agent registry, live performance metrics, flow execution runner, and telemetry viewer.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #34D399, #00B4D8);">S</div>
+            <h4>Studio — Visual Builder</h4>
+            <p>Drag-and-drop workflow canvas with AI-powered blueprint generation and one-click code export.</p>
+        </div>
+    </div>
+
+    <div class="grid g2" style="margin-top: 14px;">
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #FBBF24, #F59E0B);">H</div>
+            <h4>Discovery Hub</h4>
+            <p>AI-powered use case generator — describe your business, receive top-3 high-ROI automation recommendations with impact analysis.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #F87171, #EF4444);">G</div>
+            <h4>Governance Console</h4>
+            <p>RBAC user management with Admin/Operator/Viewer roles, encrypted secrets vault, and full audit log viewer with 30-day retention.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 5: ARCHITECTURE ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label">System Design</span>
+    <h2>Three-Tier <span class="grad-text">Architecture</span></h2>
+
+    <div class="arch" style="margin-top: 14px;">
+        <div class="arch-col" style="border-top: 2px solid #6C5CE7;">
+            <h4>Frontend</h4>
+            <p class="tech-label">React 19 + Vite + React Flow</p>
+            <div class="arch-mod">Landing Page</div>
+            <div class="arch-mod">Dashboard / Control Plane</div>
+            <div class="arch-mod">Studio Canvas (Visual Editor)</div>
+            <div class="arch-mod">Discovery Hub</div>
+            <div class="arch-mod">Governance Console</div>
+            <div class="arch-mod">AgentContext (Global State)</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-col" style="border-top: 2px solid #00B4D8;">
+            <h4>Middleware</h4>
+            <p class="tech-label">Node.js + Express</p>
+            <div class="arch-mod">REST API (Port 3001)</div>
+            <div class="arch-mod">In-Memory Database</div>
+            <div class="arch-mod">Python Process Spawning</div>
+            <div class="arch-mod">CORS Configuration</div>
+            <div class="arch-mod">Wallet / Credits Engine</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-col" style="border-top: 2px solid #0077B6;">
+            <h4>Core Engine</h4>
+            <p class="tech-label">Python + LiteLLM</p>
+            <div class="arch-mod">Agent (Multi-Provider LLM)</div>
+            <div class="arch-mod">Task (Verification Engine)</div>
+            <div class="arch-mod">Flow (Deterministic DAG)</div>
+            <div class="arch-mod">RouterBrain (Cost Optimizer)</div>
+            <div class="arch-mod">TelemetryLogger (Flight Recorder)</div>
+            <div class="arch-mod">Blueprint Generator + Compiler</div>
+        </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 14px;">
+        <p><strong>Data Flow:</strong> &nbsp;User Action → React UI → Express API → Python Core Engine → LLM Provider → Response Pipeline</p>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 6: STUDIO DEEP DIVE ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-green">Core Feature</span>
+    <h2>Studio — Visual <span class="grad-text">Workflow Builder</span></h2>
+
+    <div class="two-col" style="margin-top: 10px;">
+        <div>
+            <h3>Workflow Creation</h3>
+            <ul class="cl">
+                <li>Describe workflows in plain English</li>
+                <li>AI generates agent teams automatically</li>
+                <li>Drag-and-drop nodes on interactive canvas</li>
+                <li>Connect agents, tasks, and triggers visually</li>
+                <li>Configure models, tools, and validation rules</li>
+                <li>Execute workflows with real-time monitoring</li>
+                <li>Export to production-ready Python code</li>
+            </ul>
+
+            <h3 style="margin-top: 14px;">Key Capabilities</h3>
+            <ul class="cl">
+                <li>AI Blueprint Generation from natural language</li>
+                <li>6+ LLM provider selection per agent node</li>
+                <li>Smart Routing toggle for cost optimization</li>
+                <li>Sequential and Hierarchical process modes</li>
+                <li>Integrated Flight Recorder panel</li>
+            </ul>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+            <div class="flow-box" style="width: 180px; border-color: rgba(0,180,216,0.3);">
+                <strong>Trigger Node</strong>
+                <span>Start Workflow</span>
+            </div>
+            <div class="flow-arr">↓</div>
+            <div style="display: flex; gap: 10px;">
+                <div class="flow-box">
+                    <strong>Research Agent</strong>
+                    <span>Gemini 2.5 Flash</span>
+                </div>
+                <div class="flow-box">
+                    <strong>Analyst Agent</strong>
+                    <span>GPT-4o</span>
+                </div>
+            </div>
+            <div class="flow-arr">↓</div>
+            <div class="flow-box" style="width: 180px; border-color: rgba(52,211,153,0.3);">
+                <strong>Final Report Task</strong>
+                <span>Verified Output</span>
+            </div>
+            <div class="flow-arr">↓</div>
+            <div class="flow-box" style="width: 180px; border-color: rgba(251,191,36,0.3);">
+                <strong>Code Export</strong>
+                <span>Python + YAML Files</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 7: PROBLEMS SOLVED ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-green">Implementation</span>
+    <h2>20 Problems Identified — <span class="grad-text">~70% Addressed</span></h2>
+
+    <div class="grid g4" style="margin-top: 12px; margin-bottom: 14px;">
+        <div class="card" style="text-align: center; padding: 14px;">
+            <div class="stat-val">14</div>
+            <p class="stat-label">Fully Implemented</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 14px;">
+            <div class="stat-val">6</div>
+            <p class="stat-label">Partially Done</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 14px;">
+            <div class="stat-val">10</div>
+            <p class="stat-label">On Roadmap</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 14px;">
+            <div class="stat-val">70%</div>
+            <p class="stat-label">Coverage Today</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>#</th><th>Problem</th><th>Solution</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Unpredictable Behavior</td><td>Verification Engine + Deterministic Flows</td><td><span class="badge b-done">Implemented</span></td></tr>
+            <tr><td>2</td><td>High API Costs</td><td>RouterBrain + LLM Caching + Wallet System</td><td><span class="badge b-done">Implemented</span></td></tr>
+            <tr><td>3</td><td>Difficult Debugging</td><td>Flight Recorder + Visual Execution Timeline</td><td><span class="badge b-done">Implemented</span></td></tr>
+            <tr><td>4</td><td>Agent Hallucinations</td><td>Cross-Agent Validation + Rules Engine</td><td><span class="badge b-partial">Partial</span></td></tr>
+            <tr><td>5</td><td>Infinite Loops</td><td>Max Iteration Limits + Hard Cutoffs</td><td><span class="badge b-done">Implemented</span></td></tr>
+            <tr><td>6</td><td>Manual Prompting</td><td>AI Blueprint Generator + Quick Templates</td><td><span class="badge b-done">Implemented</span></td></tr>
+            <tr><td>7</td><td>Weak Memory</td><td>Short-Term Memory (5 interactions)</td><td><span class="badge b-partial">Partial</span></td></tr>
+            <tr><td>8</td><td>No Governance</td><td>RBAC + Secrets Vault + Audit Logs</td><td><span class="badge b-done">Implemented</span></td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- ==================== SLIDE 8: KEY FEATURES ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label">Differentiators</span>
+    <h2>Key Features <span class="grad-text">Deep Dive</span></h2>
+
+    <div class="grid g2" style="margin-top: 14px;">
+        <div class="card">
+            <div class="card-icon">R</div>
+            <h4>Smart Model Routing — RouterBrain</h4>
+            <p>AI evaluates cognitive load of each task and selects the cheapest capable model automatically. Use Gemini Flash for summaries, GPT-4o only for complex reasoning. <strong style="color: var(--green);">Potential 50–90% cost reduction.</strong></p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #00B4D8, #0077B6);">F</div>
+            <h4>Flight Recorder — Full Telemetry</h4>
+            <p>Every prompt, response, tool call, token count, latency, and cost — logged and visualized. Debug agent failures with forensic-level tracing. Complete enterprise audit trail.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #34D399, #00B4D8);">V</div>
+            <h4>Verification Engine — Quality Assurance</h4>
+            <p>Every task can define validation rules. A dedicated verifier LLM checks outputs against those rules with up to 3 automatic retries. Bad outputs never propagate downstream.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: linear-gradient(135deg, #FBBF24, #F59E0B);">E</div>
+            <h4>One-Click Code Export</h4>
+            <p>Visual workflows export instantly to production-ready Python: agents.py, tasks.py, crew.py, YAML configs, and requirements.txt. From canvas to deployment in seconds.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 9: TECH STACK ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-blue">Technology</span>
+    <h2>Built on <span class="grad-text">Modern Infrastructure</span></h2>
+
+    <div class="two-col" style="margin-top: 12px;">
+        <div>
+            <h3>Core Stack</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <div class="tech-row"><div class="tech-dot"></div><span class="tech-name">React 19</span><span class="tech-desc">UI Framework</span></div>
+                <div class="tech-row"><div class="tech-dot" style="background: #00B4D8;"></div><span class="tech-name">Vite 8</span><span class="tech-desc">Build Tool &amp; Dev Server</span></div>
+                <div class="tech-row"><div class="tech-dot" style="background: #34D399;"></div><span class="tech-name">React Flow</span><span class="tech-desc">Visual Node Editor (Studio)</span></div>
+                <div class="tech-row"><div class="tech-dot" style="background: #FBBF24;"></div><span class="tech-name">Express.js</span><span class="tech-desc">REST API Server</span></div>
+                <div class="tech-row"><div class="tech-dot" style="background: #F87171;"></div><span class="tech-name">Python</span><span class="tech-desc">Core AI Engine</span></div>
+                <div class="tech-row"><div class="tech-dot" style="background: #A29BFE;"></div><span class="tech-name">LiteLLM</span><span class="tech-desc">Universal LLM Abstraction (50+ Providers)</span></div>
+            </div>
+        </div>
+        <div>
+            <h3>Supported LLM Providers</h3>
+            <table style="margin-top: 8px;">
+                <thead>
+                    <tr><th>Provider</th><th>Models</th><th>Tier</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Google</td><td>Gemini 2.5 Flash / Pro</td><td><span class="badge b-done">Default</span></td></tr>
+                    <tr><td>OpenAI</td><td>GPT-4o, GPT-4o Mini</td><td><span class="badge b-partial">Supported</span></td></tr>
+                    <tr><td>Anthropic</td><td>Claude 3.5 Sonnet</td><td><span class="badge b-partial">Supported</span></td></tr>
+                    <tr><td>DeepSeek</td><td>V3, Coder</td><td><span class="badge b-partial">Supported</span></td></tr>
+                    <tr><td>Groq</td><td>Llama 3, Mixtral</td><td><span class="badge b-partial">Supported</span></td></tr>
+                    <tr><td>Ollama</td><td>Local Models</td><td><span class="badge b-partial">Free</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 10: COMPETITIVE ADVANTAGE ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-green">Market Position</span>
+    <h2>AgentOS vs <span class="grad-text">Competitors</span></h2>
+
+    <table style="margin-top: 16px;">
+        <thead>
+            <tr><th style="width: 22%;">Capability</th><th style="width: 39%;">AgentOS</th><th style="width: 39%;">Typical Competitors</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Execution</strong></td>
+                <td style="color: var(--green);">Deterministic flows with explicit state transitions</td>
+                <td style="opacity: 0.5;">LLM-decided paths — unpredictable</td>
+            </tr>
+            <tr>
+                <td><strong>Cost Control</strong></td>
+                <td style="color: var(--green);">RouterBrain + per-token tracking + wallet</td>
+                <td style="opacity: 0.5;">Manual model selection, no awareness</td>
+            </tr>
+            <tr>
+                <td><strong>Visual Builder</strong></td>
+                <td style="color: var(--green);">Full drag-and-drop + AI generation + export</td>
+                <td style="opacity: 0.5;">CLI-only or basic YAML configs</td>
+            </tr>
+            <tr>
+                <td><strong>Observability</strong></td>
+                <td style="color: var(--green);">Flight Recorder — full trace logging</td>
+                <td style="opacity: 0.5;">Minimal or no built-in tracing</td>
+            </tr>
+            <tr>
+                <td><strong>LLM Support</strong></td>
+                <td style="color: var(--green);">50+ providers via LiteLLM (incl. local)</td>
+                <td style="opacity: 0.5;">Often locked to single provider</td>
+            </tr>
+            <tr>
+                <td><strong>Monetization</strong></td>
+                <td style="color: var(--green);">Built-in SaaS markup (3×) + credits</td>
+                <td style="opacity: 0.5;">No built-in monetization layer</td>
+            </tr>
+            <tr>
+                <td><strong>Code Export</strong></td>
+                <td style="color: var(--green);">One-click → production Python files</td>
+                <td style="opacity: 0.5;">No export capability</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- ==================== SLIDE 11: IMPLEMENTATION STATUS ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-green">Progress</span>
+    <h2>What's Built vs <span class="grad-text">What's Next</span></h2>
+
+    <div class="two-col" style="margin-top: 12px;">
+        <div>
+            <h3 style="color: var(--green);">Implemented Today</h3>
+            <ul class="cl" style="margin-top: 6px;">
+                <li>Deterministic Flow Execution (Sequential + Async)</li>
+                <li>Smart Model Routing (RouterBrain)</li>
+                <li>LLM Response Caching via LiteLLM</li>
+                <li>Flight Recorder (Full Telemetry Logging)</li>
+                <li>Verification Engine with 3 Auto-Retries</li>
+                <li>Visual Studio with React Flow Canvas</li>
+                <li>AI Blueprint Generation from NL Prompts</li>
+                <li>Code Export (Python + YAML + requirements)</li>
+                <li>Discovery Hub (AI Use Case Generator)</li>
+                <li>RBAC + Secrets Vault + Audit Logs</li>
+                <li>SaaS Wallet &amp; Credit System</li>
+                <li>Multi-Provider LLM Support (50+)</li>
+                <li>Web Search Tool (DuckDuckGo)</li>
+                <li>Parallel DAG-Based Execution</li>
+            </ul>
+        </div>
+        <div>
+            <h3 style="color: var(--accent2);">Planned — Next Phases</h3>
+            <ul class="cl" style="margin-top: 6px;">
+                <li>Persistent Database (PostgreSQL / MongoDB)</li>
+                <li>WebSocket Real-Time Streaming</li>
+                <li>Mem0 Integration (Long-Term Memory)</li>
+                <li>LangFuse Observability Platform</li>
+                <li>Prompt Versioning System</li>
+                <li>OAuth / SAML SSO Authentication</li>
+                <li>Docker + One-Click Cloud Deployment</li>
+                <li>Workflow Marketplace (Publish &amp; Fork)</li>
+                <li>Real-Time Collaboration (CRDT-Based)</li>
+                <li>RAG + Context Auto-Compression</li>
+                <li>Connector Marketplace (Gmail, Notion, DBs)</li>
+                <li>Confidence Scoring on Outputs</li>
+                <li>Pre-Execution Cost Forecasting</li>
+                <li>SOC 2 / ISO 27001 Certification</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 12: ROADMAP ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-blue">Strategy</span>
+    <h2>Product <span class="grad-text">Roadmap</span></h2>
+
+    <div class="tl" style="margin-top: 16px;">
+        <div class="tl-item">
+            <div class="tl-phase">Phase 1 — Current → Q3 2026</div>
+            <div class="tl-title">Foundation Hardening</div>
+            <ul class="tl-list">
+                <li>Enforce RBAC at API layer with middleware authentication</li>
+                <li>Persistent database (PostgreSQL / MongoDB)</li>
+                <li>WebSocket-based real-time execution streaming</li>
+                <li>Persistent telemetry storage &amp; pre-execution cost forecasting</li>
+            </ul>
+        </div>
+        <div class="tl-item">
+            <div class="tl-phase">Phase 2 — Q3 → Q4 2026</div>
+            <div class="tl-title">Enterprise Features</div>
+            <ul class="tl-list">
+                <li>Mem0 integration for persistent agent memory across sessions</li>
+                <li>LangFuse / SigNoz for production-grade observability</li>
+                <li>OAuth/SAML SSO + Docker containerization + one-click deployment</li>
+            </ul>
+        </div>
+        <div class="tl-item">
+            <div class="tl-phase">Phase 3 — Q1 → Q2 2027</div>
+            <div class="tl-title">Marketplace &amp; Scale</div>
+            <ul class="tl-list">
+                <li>Workflow marketplace — publish, discover, and fork templates</li>
+                <li>Real-time multi-user collaboration (CRDT-based)</li>
+                <li>Full connector marketplace + SOC 2 / ISO 27001 certification</li>
+            </ul>
+        </div>
+        <div class="tl-item">
+            <div class="tl-phase">Phase 4 — Q2 2027+</div>
+            <div class="tl-title">Intelligence Layer</div>
+            <ul class="tl-list">
+                <li>Hallucination verification (Patronus/Arize) + confidence scoring</li>
+                <li>Automated A/B testing + goal completion detection</li>
+                <li>Advanced cost optimization with historical routing data</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 13: BUSINESS MODEL ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-orange">Revenue</span>
+    <h2>Monetization <span class="grad-text">Strategy</span></h2>
+
+    <div class="pricing" style="margin-top: 14px;">
+        <div class="price-card">
+            <h4>Free</h4>
+            <div class="price-amount">$0</div>
+            <p class="price-desc">Individual developers</p>
+            <ul>
+                <li>Basic Studio access</li>
+                <li>Up to 5 agents</li>
+                <li>Community support</li>
+                <li>Limited flow executions</li>
+                <li>In-memory telemetry only</li>
+            </ul>
+        </div>
+        <div class="price-card featured">
+            <span class="label" style="margin-bottom: 8px;">Recommended</span>
+            <h4>Pro</h4>
+            <div class="price-amount">$49<span style="font-size: 0.4em; color: var(--text-dim);">/month</span></div>
+            <p class="price-desc">Teams &amp; startups</p>
+            <ul>
+                <li>Unlimited agents &amp; flows</li>
+                <li>Discovery Hub access</li>
+                <li>Code export to Python</li>
+                <li>Persistent telemetry</li>
+                <li>Smart model routing</li>
+                <li>Priority support</li>
+            </ul>
+        </div>
+        <div class="price-card">
+            <h4>Enterprise</h4>
+            <div class="price-amount">Custom</div>
+            <p class="price-desc">Large organizations</p>
+            <ul>
+                <li>Everything in Pro</li>
+                <li>SSO / SAML integration</li>
+                <li>Full RBAC &amp; governance</li>
+                <li>Dedicated infrastructure</li>
+                <li>SLA guarantee</li>
+                <li>SOC 2 compliance</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 14px;">
+        <p><strong>Built-in Revenue Engine:</strong> 3× platform markup on all LLM API costs — monetization is automatic on every flow execution.</p>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 14: EXTERNAL TOOLS ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-orange">Infrastructure</span>
+    <h2>External Services <span class="grad-text">Required</span></h2>
+
+    <table style="margin-top: 14px;">
+        <thead>
+            <tr><th>Capability</th><th>Recommended Tool</th><th>Est. Cost/Month</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Memory Persistence</td><td>Mem0</td><td>$100 – $500</td><td><span style="color: var(--red);">High</span></td></tr>
+            <tr><td>Observability &amp; Tracing</td><td>LangFuse / SigNoz</td><td>Free – $500</td><td><span style="color: var(--red);">High</span></td></tr>
+            <tr><td>Output Verification</td><td>Patronus / Arize</td><td>$500+</td><td><span style="color: var(--yellow);">Medium</span></td></tr>
+            <tr><td>Cost Optimization</td><td>TrueFoundry / Custom</td><td>$200 – $1,000</td><td><span style="color: var(--yellow);">Medium</span></td></tr>
+            <tr><td>Compliance &amp; Audit</td><td>Enterprise AMP</td><td>$250 – $2,000+</td><td><span style="color: var(--yellow);">Medium</span></td></tr>
+        </tbody>
+    </table>
+
+    <div class="grid g3" style="margin-top: 16px;">
+        <div class="card" style="text-align: center; padding: 16px;">
+            <div class="stat-val" style="font-size: 1.4em;">$300–800</div>
+            <p class="stat-label">MVP (Open Source)</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 16px;">
+            <div class="stat-val" style="font-size: 1.4em;">$1.5–3.5K</div>
+            <p class="stat-label">Standard Enterprise</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 16px;">
+            <div class="stat-val" style="font-size: 1.4em;">$3–5K+</div>
+            <p class="stat-label">Full Enterprise Suite</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 15: WORKFLOW DEMO ==================== -->
+<section data-background-color="#0B0D17">
+    <span class="label label-green">How It Works</span>
+    <h2>End-to-End <span class="grad-text">Execution Flow</span></h2>
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 28px;">
+        <div class="flow-row">
+            <div class="flow-box" style="border-color: rgba(251,191,36,0.3);">
+                <strong>User Input</strong>
+                <span>"Research AI in fintech"</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(108,92,231,0.3);">
+                <strong>RouterBrain</strong>
+                <span>Selects optimal model</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(0,180,216,0.3);">
+                <strong>Research Agent</strong>
+                <span>Web search + analysis</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(0,180,216,0.3);">
+                <strong>Writer Agent</strong>
+                <span>Drafts report</span>
+            </div>
+        </div>
+
+        <div class="flow-arr" style="font-size: 1.2em;">↓</div>
+
+        <div class="flow-row">
+            <div class="flow-box" style="border-color: rgba(248,113,113,0.3);">
+                <strong>Verification</strong>
+                <span>Rules check + retry</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(108,92,231,0.3);">
+                <strong>Flight Recorder</strong>
+                <span>Log all telemetry</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(251,191,36,0.3);">
+                <strong>Wallet Deduction</strong>
+                <span>Track cost + debit</span>
+            </div>
+            <div class="flow-arr">→</div>
+            <div class="flow-box" style="border-color: rgba(52,211,153,0.3);">
+                <strong>Verified Output</strong>
+                <span>Final report delivered</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid g3" style="margin-top: 28px;">
+        <div class="highlight">
+            <p><strong>Deterministic:</strong> Every step follows user-defined state transitions.</p>
+        </div>
+        <div class="highlight">
+            <p><strong>Cost-Tracked:</strong> Every token counted, every cost logged and deducted.</p>
+        </div>
+        <div class="highlight">
+            <p><strong>Auditable:</strong> Full trace available for debugging and compliance.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SLIDE 16: CLOSING ==================== -->
+<section class="cta-slide" data-background-color="#0B0D17">
+    <div class="logo-icon" style="margin-bottom: 24px;">A</div>
+    <h2 style="font-size: 2.2em;"><span class="grad-text">The Future of Enterprise AI</span><br><span style="font-size: 0.5em; font-weight: 400; color: var(--text-dim);">starts with the right operating system.</span></h2>
+    <p style="max-width: 520px; font-size: 0.85em; color: var(--text-dim); margin-top: 12px;">
+        AgentOS provides the infrastructure layer enterprises need to safely build, deploy, and govern AI agents at scale — with full cost control, observability, and deterministic execution.
+    </p>
+    <a class="cta-btn" href="#">Get Started</a>
+    <p style="margin-top: 36px; font-size: 0.6em; color: #444;">
+        AgentOS v1.0 &nbsp;·&nbsp; The Operating System for Enterprise AI Agents &nbsp;·&nbsp; Confidential
+    </p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.2.0/reveal.min.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'fade',
+        transitionSpeed: 'fast',
+        backgroundTransition: 'none',
+        width: 1280,
+        height: 720,
+        margin: 0,
+        minScale: 0.2,
+        maxScale: 1.0,
+        center: false,
+        progress: true,
+        controls: true,
+        controlsLayout: 'bottom-right',
+        embedded: false,
+        disableLayout: false,
+    });
+</script>
+</body>
+</html>
