@@ -700,7 +700,7 @@ export default function Studio() {
           
           <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)' }}>
             <div style={{ 
-              background: isDarkMode ? '#1e293b' : '#f1f5f9', 
+              background: isDarkMode ? '#1a1a1a' : '#f1f5f9', 
               borderRadius: '20px', 
               padding: '0.75rem 1rem',
               display: 'flex',
@@ -710,6 +710,7 @@ export default function Studio() {
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
             }}>
               <textarea 
+                className="no-focus-ring"
                 data-gramm="false"
                 spellCheck="false"
                 placeholder="Ask, build, or solve doubts..."
