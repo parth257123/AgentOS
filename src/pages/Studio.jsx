@@ -413,7 +413,6 @@ export default function Studio() {
           });
         }
 
-        // Add DAG task context connections
         if (t.context && t.context.length > 0) {
           t.context.forEach(ctxId => {
             currentEdges.push({
@@ -424,14 +423,24 @@ export default function Studio() {
               style: { stroke: 'var(--success)' }
             });
           });
-        } else if (i === 0 || !t.context) {
-          // If it has no context dependencies, connect it to the Trigger node!
+        } else if (i === 0) {
+          // Connect the first task to the trigger
           currentEdges.push({
             id: `e-trigger-${t.id}`,
             source: 'trigger-1',
             target: t.id,
             animated: true,
             style: { stroke: '#a855f7' }
+          });
+        } else {
+          // Fallback to sequential chaining: connect this task to the previous task
+          const prevTask = blueprint.tasks[i - 1];
+          currentEdges.push({
+            id: `e-${prevTask.id}-${t.id}`,
+            source: prevTask.id,
+            target: t.id,
+            animated: true,
+            style: { stroke: 'var(--text-secondary)' }
           });
         }
         
