@@ -62,6 +62,7 @@ export default function Studio() {
   const [projectId, setProjectId] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [isRunning, setIsRunning] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
   const [processType, setProcessType] = useState('sequential');
 
@@ -83,7 +84,6 @@ export default function Studio() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportedCode, setExportedCode] = useState(null);
   const [activeExportTab, setActiveExportTab] = useState('crew.py');
-  const [processType, setProcessType] = useState('sequential');
   const [projectTitle, setProjectTitle] = useState('Untitled Project');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
