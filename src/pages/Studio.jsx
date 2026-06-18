@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { marked } from 'marked';
 import dagre from 'dagre';
-import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge, ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon, GitBranch } from 'lucide-react';
 import { AgentNode, TaskNode, TriggerNode } from '../components/CustomNodes';
@@ -55,8 +55,9 @@ const getLayoutedElements = (nodes, edges, direction = 'LR') => {
   return { nodes: newNodes, edges };
 };
 
-export default function Studio() {
+function StudioComponent() {
   const { tenantId } = useTenant();
+  const { fitView } = useReactFlow();
   const { runCustomFlow, flowTraces, flowLogs, projects, saveProject, nodeStates } = useAgents();
   const [viewMode, setViewMode] = useState('home'); 
   const [projectId, setProjectId] = useState(null);
@@ -73,8 +74,12 @@ export default function Studio() {
       const layouted = getLayoutedElements(nodes, edges, direction);
       setNodes(layouted.nodes);
       setEdges(layouted.edges);
+      
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 50);
     }
-  }, [processType]); // Only trigger when processType changes
+  }, [processType, fitView]); // Only trigger when processType changes
   const [nlPrompt, setNlPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -268,6 +273,11 @@ export default function Studio() {
     setEdges(p.edges || []);
     setViewMode('editor');
     setGenerationThoughts([]);
+    
+    // Fit view after a small delay to ensure React has rendered the nodes
+    setTimeout(() => {
+      fitView({ padding: 0.2, duration: 800 });
+    }, 100);
   };
 
   const generateBlueprintFromText = async (customPrompt = null) => {
@@ -449,6 +459,11 @@ export default function Studio() {
       
       // Auto-save the project so the user doesn't lose their generated DAG
       await autoSaveProject(blueprint.title, currentNodes, currentEdges);
+
+      // Fit the view to show the newly generated diagram perfectly
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 100);
 
     } catch (err) {
       console.error(err);
@@ -1140,5 +1155,13 @@ function DagModal({ analysis, onClose }) {
         </table>
       </div>
     </div>
+  );
+}
+
+export default function Studio() {
+  return (
+    <ReactFlowProvider>
+      <StudioComponent />
+    </ReactFlowProvider>
   );
 }
