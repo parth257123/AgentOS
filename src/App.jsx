@@ -7,6 +7,7 @@ import Studio from './pages/Studio';
 import Optimize from './pages/Optimize';
 import Performance from './pages/Performance';
 import Marketplace from './pages/Marketplace';
+import Settings from './pages/Settings';
 import DashboardLayout from './components/DashboardLayout';
 import { AgentProvider } from './context/AgentContext';
 import { TenantProvider } from './context/TenantContext';
@@ -27,6 +28,7 @@ function App() {
               <Route path="optimize" element={<Optimize />} />
               <Route path="performance" element={<Performance />} />
               <Route path="marketplace" element={<Marketplace />} />
+              <Route path="settings" element={<Settings />} />
               {/* Fallbacks for other sidebar links */}
               <Route path="*" element={<div style={{padding: '2rem'}}><h2>Coming Soon</h2><p>This module is under construction.</p></div>} />
             </Route>

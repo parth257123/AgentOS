@@ -326,6 +326,7 @@ app.post('/api/projects', (req, res) => {
   
   if (existingIndex >= 0) {
     projects[existingIndex] = { ...projects[existingIndex], name, nodes, edges, days: 0 };
+    dispatchWebhook(req.tenantId, 'project_saved', { project_id: id, name });
     res.json(projects[existingIndex]);
   } else {
     const newProject = {
@@ -339,6 +340,7 @@ app.post('/api/projects', (req, res) => {
       tenant: req.tenantId
     };
     projects.push(newProject);
+    dispatchWebhook(req.tenantId, 'project_saved', { project_id: newProject.id, name: newProject.name });
     res.status(201).json(newProject);
   }
 });
@@ -365,6 +367,7 @@ app.post('/api/agents', (req, res) => {
     tenant: req.tenantId
   };
   agents.push(newAgent);
+  dispatchWebhook(req.tenantId, 'agent_created', { agent_id: newAgent.id, name: newAgent.name });
   res.status(201).json(newAgent);
 });
 
@@ -749,6 +752,79 @@ app.get('/api/analytics/performance', (req, res) => {
     ]
   };
   res.json(performance);
+});
+
+// --- Node.js Event Dispatcher ---
+const dispatchWebhook = async (tenantId, eventType, payload) => {
+  const webhookFile = path.join(__dirname, `../.agentos_webhooks/${tenantId}.json`);
+  if (!fs.existsSync(webhookFile)) return;
+  try {
+    const data = JSON.parse(fs.readFileSync(webhookFile));
+    const urls = new Set([
+      ...(data[eventType] || []),
+      ...(data['*'] || [])
+    ]);
+    
+    const body = JSON.stringify({ event_type: eventType, tenant_id: tenantId, ...payload });
+    urls.forEach(url => {
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
+        .catch(err => console.error(`[Node Dispatcher] Failed to deliver webhook to ${url}:`, err));
+    });
+  } catch (e) {
+    console.error("Error reading webhook file:", e);
+  }
+};
+
+// --- Webhooks Management Endpoints ---
+app.get('/api/webhooks', (req, res) => {
+  const tenantId = req.tenantId;
+  const webhookDir = path.join(__dirname, '../.agentos_webhooks');
+  const logFile = path.join(webhookDir, `${tenantId}.json`);
+  if (!fs.existsSync(logFile)) return res.json({ subscriptions: {} });
+  try {
+    const data = JSON.parse(fs.readFileSync(logFile));
+    res.json({ subscriptions: data });
+  } catch (e) {
+    res.json({ subscriptions: {} });
+  }
+});
+
+app.post('/api/webhooks', (req, res) => {
+  const tenantId = req.tenantId;
+  const { event_type, url } = req.body;
+  const webhookDir = path.join(__dirname, '../.agentos_webhooks');
+  if (!fs.existsSync(webhookDir)) fs.mkdirSync(webhookDir, { recursive: true });
+  
+  const logFile = path.join(webhookDir, `${tenantId}.json`);
+  let data = {};
+  if (fs.existsSync(logFile)) {
+    try { data = JSON.parse(fs.readFileSync(logFile)); } catch (e) {}
+  }
+  
+  if (!data[event_type]) data[event_type] = [];
+  if (!data[event_type].includes(url)) data[event_type].push(url);
+  
+  fs.writeFileSync(logFile, JSON.stringify(data, null, 2));
+  res.json({ success: true, subscriptions: data });
+});
+
+app.delete('/api/webhooks', (req, res) => {
+  const tenantId = req.tenantId;
+  const { event_type, url } = req.body;
+  const logFile = path.join(__dirname, `../.agentos_webhooks/${tenantId}.json`);
+  
+  if (!fs.existsSync(logFile)) return res.json({ success: true });
+  try {
+    let data = JSON.parse(fs.readFileSync(logFile));
+    if (data[event_type]) {
+      data[event_type] = data[event_type].filter(u => u !== url);
+      if (data[event_type].length === 0) delete data[event_type];
+      fs.writeFileSync(logFile, JSON.stringify(data, null, 2));
+    }
+    res.json({ success: true, subscriptions: data });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update webhooks' });
+  }
 });
 
 app.listen(PORT, () => {
