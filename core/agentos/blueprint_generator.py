@@ -230,7 +230,7 @@ The JSON schema must be exactly:
 
     try:
         response = None
-        models_to_try = ["glm5.2", "openai/glm5.2", "gemini/gemini-1.5-flash", "gemini/gemini-1.5-pro"]
+        models_to_try = ["openai/glm5.2", "glm5.2", "gemini/gemini-3.5-flash", "gemini/gemini-2.5-pro", "gemini/gemini-2.5-flash"]
         errors = []
         for model_name in models_to_try:
             try:
