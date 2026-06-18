@@ -1,6 +1,6 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Bot, Target, Settings2, ChevronDown, Search, Calculator, FileText, Code, Globe, Zap, Clock, Settings } from 'lucide-react';
+import { Bot, Target, Settings2, ChevronDown, Search, Calculator, FileText, Code, Globe, Zap, Clock, Settings, Building2, Users } from 'lucide-react';
 import { useAgents } from '../context/AgentContext';
 
 const toolIcons = {
@@ -248,6 +248,82 @@ export const TriggerNode = ({ id, data }) => {
       <Handle type="target" position={Position.Left} id="trigger-in-left" style={{ background: isDark ? '#a855f7' : '#9333ea', width: '10px', height: '10px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
       <Handle type="source" position={Position.Right} id="trigger-out-right" style={{ background: isDark ? '#a855f7' : '#9333ea', width: '10px', height: '10px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
       <Handle type="source" position={Position.Bottom} id="trigger-out-bottom" style={{ background: isDark ? '#a855f7' : '#9333ea', width: '10px', height: '10px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
+    </div>
+  );
+};
+
+export const CompanyNode = ({ id, data }) => {
+  const isDark = data.theme === 'dark';
+  
+  const borderStyle = isDark ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid #fcd34d';
+  const boxShadowStyle = isDark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 12px rgba(0,0,0,0.05)';
+
+  return (
+    <div 
+      className="custom-flow-node node-company"
+      style={{ 
+        background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
+        border: borderStyle, 
+        borderRadius: '12px', 
+        width: '260px', 
+        color: isDark ? 'white' : '#1e293b', 
+        boxShadow: boxShadowStyle,
+        overflow: 'hidden'
+      }}
+    >
+      <div style={{ background: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #fef3c7' }}>
+        <div style={{ background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fde68a', padding: '0.4rem', borderRadius: '8px' }}>
+          <Building2 size={20} color={isDark ? "#fbbf24" : "#d97706"} />
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '0.02em', color: isDark ? '#fbbf24' : '#b45309' }}>{data.name || 'Company Name'}</div>
+          <div style={{ fontSize: '0.7rem', color: isDark ? 'var(--text-secondary)' : '#92400e', marginTop: '2px', fontWeight: 500 }}>{data.industry || 'Organization'}</div>
+        </div>
+      </div>
+      
+      {data.description && (
+        <div style={{ padding: '0.75rem 1rem', fontSize: '0.75rem', color: isDark ? 'var(--text-secondary)' : '#475569', lineHeight: 1.4 }}>
+          {data.description.length > 80 ? data.description.substring(0, 80) + '...' : data.description}
+        </div>
+      )}
+
+      <Handle type="target" position={Position.Top} id="company-in-top" style={{ background: isDark ? '#fbbf24' : '#d97706', width: '12px', height: '12px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
+      <Handle type="source" position={Position.Bottom} id="company-out-bottom" style={{ background: isDark ? '#fbbf24' : '#d97706', width: '12px', height: '12px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
+    </div>
+  );
+};
+
+export const TeamNode = ({ id, data }) => {
+  const isDark = data.theme === 'dark';
+  
+  const borderStyle = isDark ? '1px solid rgba(236, 72, 153, 0.5)' : '1px solid #fbcfe8';
+  const boxShadowStyle = isDark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 12px rgba(0,0,0,0.05)';
+
+  return (
+    <div 
+      className="custom-flow-node node-team"
+      style={{ 
+        background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
+        border: borderStyle, 
+        borderRadius: '12px', 
+        width: '240px', 
+        color: isDark ? 'white' : '#1e293b', 
+        boxShadow: boxShadowStyle,
+        overflow: 'hidden'
+      }}
+    >
+      <div style={{ padding: '0.85rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #fdf2f8' }}>
+        <div style={{ background: isDark ? 'rgba(236, 72, 153, 0.15)' : '#fce7f3', padding: '0.35rem', borderRadius: '8px' }}>
+          <Users size={18} color={isDark ? "#f472b6" : "#db2777"} />
+        </div>
+        <div>
+          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: isDark ? '#f472b6' : '#be185d' }}>{data.name || 'Team Name'}</div>
+          <div style={{ fontSize: '0.7rem', color: isDark ? 'var(--text-secondary)' : '#9d174d', marginTop: '2px' }}>{data.focus || 'Department'}</div>
+        </div>
+      </div>
+      
+      <Handle type="target" position={Position.Top} id="team-in-top" style={{ background: isDark ? '#f472b6' : '#db2777', width: '10px', height: '10px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
+      <Handle type="source" position={Position.Bottom} id="team-out-bottom" style={{ background: isDark ? '#f472b6' : '#db2777', width: '10px', height: '10px', border: `2px solid ${isDark ? 'rgba(20,20,30,0.95)' : 'white'}` }} />
     </div>
   );
 };

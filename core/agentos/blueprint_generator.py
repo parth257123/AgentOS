@@ -218,6 +218,22 @@ The JSON schema must be exactly:
     "type": "chat" | "dag",
     "message": "Conversational response (only if type is chat)",
     "title": "Short catchy name for this project (only if type is dag)",
+    "companies": [
+        {{
+            "id": "company-1",
+            "name": "E.g. Acme Corp",
+            "industry": "Short industry name",
+            "description": "Short description"
+        }}
+    ],
+    "teams": [
+        {{
+            "id": "team-1",
+            "name": "E.g. Marketing Team",
+            "focus": "Department focus",
+            "company_id": "company-1" // Maps to a company
+        }}
+    ],
     "agents": [
         {{
             "id": "agent-1", // Must be unique strings
@@ -225,7 +241,8 @@ The JSON schema must be exactly:
             "role": "Short role title",
             "goal": "What does this agent aim to achieve?",
             "backstory": "A 1-sentence persona for this agent.",
-            "tools": ["web_search", "calculator"] // Pick from available tools if needed
+            "tools": ["web_search", "calculator"], // Pick from available tools if needed
+            "team_id": "team-1" // Optional. Maps to a team
         }}
     ],
     "tasks": [
@@ -234,7 +251,8 @@ The JSON schema must be exactly:
             "name": "E.g. Scrape the web",
             "description": "Detailed instruction of what to do.",
             "expectedOutput": "What is the final deliverable?",
-            "agent_id": "agent-1" // Must map to an id in the agents array
+            "agent_id": "agent-1", // Must map to an id in the agents array
+            "context": ["task-2"] // Optional array of prerequisite task IDs
         }}
     ]
 }}

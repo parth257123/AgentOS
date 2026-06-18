@@ -4,7 +4,7 @@ import dagre from 'dagre';
 import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge, ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon, GitBranch } from 'lucide-react';
-import { AgentNode, TaskNode, TriggerNode } from '../components/CustomNodes';
+import { AgentNode, TaskNode, TriggerNode, CompanyNode, TeamNode } from '../components/CustomNodes';
 import { useAgents } from '../context/AgentContext';
 import { useTenant } from '../context/TenantContext';
 
@@ -12,6 +12,8 @@ const nodeTypes = {
   agent: AgentNode,
   task: TaskNode,
   trigger: TriggerNode,
+  company: CompanyNode,
+  team: TeamNode,
 };
 
 const initialNodes = [
@@ -185,6 +187,28 @@ function StudioComponent() {
       setWalletBalance(result.walletBalance);
     }
     setIsRunning(false);
+  };
+
+  const addCompany = () => {
+    const id = `company-${Date.now()}`;
+    const newNode = {
+      id,
+      type: 'company',
+      position: { x: Math.random() * 200 + 100, y: Math.random() * 200 + 100 },
+      data: { name: 'New Company', industry: 'Organization', theme: isDarkMode ? 'dark' : 'light' },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  };
+
+  const addTeam = () => {
+    const id = `team-${Date.now()}`;
+    const newNode = {
+      id,
+      type: 'team',
+      position: { x: Math.random() * 200 + 100, y: Math.random() * 200 + 100 },
+      data: { name: 'New Team', focus: 'Department', theme: isDarkMode ? 'dark' : 'light' },
+    };
+    setNodes((nds) => nds.concat(newNode));
   };
 
   const addAgent = () => {
@@ -366,7 +390,55 @@ function StudioComponent() {
       ];
       let currentEdges = [];
 
-      // 3. Process Agents sequentially
+      // 3a. Process Companies sequentially
+      for (let i = 0; i < (blueprint.companies || []).length; i++) {
+        const c = blueprint.companies[i];
+        setGenerationThoughts(prev => [...prev, { type: 'step', text: `Creating Company: ${c.name}` }]);
+        
+        currentNodes.push({
+          id: c.id, type: 'company', position: { x: 100 + (i * 300), y: 100 },
+          data: { name: c.name, industry: c.industry, description: c.description, theme: isDarkMode ? 'dark' : 'light' }
+        });
+        
+        currentEdges.push({
+          id: `e-trigger-${c.id}`, source: 'trigger-1', target: c.id, animated: true, style: { stroke: '#fbbf24' }
+        });
+        
+        setNodes([...currentNodes]);
+        setEdges([...currentEdges]);
+        await new Promise(r => setTimeout(r, 600));
+      }
+
+      // 3b. Process Teams sequentially
+      for (let i = 0; i < (blueprint.teams || []).length; i++) {
+        const t = blueprint.teams[i];
+        setGenerationThoughts(prev => [...prev, { type: 'step', text: `Creating Team: ${t.name}` }]);
+        
+        currentNodes.push({
+          id: t.id, type: 'team', position: { x: 150 + (i * 280), y: 200 },
+          data: { name: t.name, focus: t.focus, theme: isDarkMode ? 'dark' : 'light' }
+        });
+        
+        if (t.company_id) {
+          currentEdges.push({
+            id: `e-${t.company_id}-${t.id}`, source: t.company_id, target: t.id, animated: true, style: { stroke: '#f472b6' }
+          });
+        } else if (blueprint.companies && blueprint.companies.length > 0) {
+          currentEdges.push({
+            id: `e-${blueprint.companies[0].id}-${t.id}`, source: blueprint.companies[0].id, target: t.id, animated: true, style: { stroke: '#f472b6' }
+          });
+        } else {
+          currentEdges.push({
+            id: `e-trigger-${t.id}`, source: 'trigger-1', target: t.id, animated: true, style: { stroke: '#f472b6' }
+          });
+        }
+        
+        setNodes([...currentNodes]);
+        setEdges([...currentEdges]);
+        await new Promise(r => setTimeout(r, 600));
+      }
+
+      // 3c. Process Agents sequentially
       for (let i = 0; i < (blueprint.agents || []).length; i++) {
         const a = blueprint.agents[i];
         setGenerationThoughts(prev => [...prev, { type: 'step', text: `Creating Agent: ${a.name}` }]);
@@ -393,14 +465,24 @@ function StudioComponent() {
         };
         currentNodes.push(agentNode);
         
-        // Structure the hierarchy: Trigger -> Agent
-        currentEdges.push({
-          id: `e-trigger-${a.id}`,
-          source: 'trigger-1',
-          target: a.id,
-          animated: true,
-          style: { stroke: '#a855f7' }
-        });
+        // Structure the hierarchy: Team/Company/Trigger -> Agent
+        if (a.team_id) {
+          currentEdges.push({
+            id: `e-${a.team_id}-${a.id}`, source: a.team_id, target: a.id, animated: true, style: { stroke: '#a855f7' }
+          });
+        } else if (blueprint.teams && blueprint.teams.length > 0) {
+          currentEdges.push({
+            id: `e-${blueprint.teams[0].id}-${a.id}`, source: blueprint.teams[0].id, target: a.id, animated: true, style: { stroke: '#a855f7' }
+          });
+        } else if (blueprint.companies && blueprint.companies.length > 0) {
+          currentEdges.push({
+            id: `e-${blueprint.companies[0].id}-${a.id}`, source: blueprint.companies[0].id, target: a.id, animated: true, style: { stroke: '#a855f7' }
+          });
+        } else {
+          currentEdges.push({
+            id: `e-trigger-${a.id}`, source: 'trigger-1', target: a.id, animated: true, style: { stroke: '#a855f7' }
+          });
+        }
         
         setNodes([...currentNodes]); // Force re-render
         setEdges([...currentEdges]);
@@ -651,6 +733,8 @@ function StudioComponent() {
           <button onClick={() => setSmartRouting(!smartRouting)} style={{ background: smartRouting ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${smartRouting ? 'var(--success)' : 'var(--border-color)'}`, color: smartRouting ? 'var(--success)' : 'var(--text-secondary)', cursor: 'pointer', padding: '0.4rem 0.8rem', borderRadius: '8px', marginRight: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }} title="Smart Routing (Cost Optimizer)">
             <Activity size={14} style={{ marginRight: '0.25rem' }} /> {smartRouting ? 'Smart Routing: ON' : 'Smart Routing: OFF'}
           </button>
+          <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.3)' }} onClick={addCompany}><Plus size={14} /> Company</button>
+          <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: 'rgba(236, 72, 153, 0.1)', color: '#f472b6', borderColor: 'rgba(236, 72, 153, 0.3)' }} onClick={addTeam}><Plus size={14} /> Team</button>
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addTrigger}><Plus size={14} /> Trigger</button>
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addAgent}><Plus size={14} /> Agent</button>
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addTask}><Plus size={14} /> Task</button>
