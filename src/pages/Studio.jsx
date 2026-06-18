@@ -373,7 +373,18 @@ export default function Studio() {
           }
         };
         currentNodes.push(agentNode);
+        
+        // Structure the hierarchy: Trigger -> Agent
+        currentEdges.push({
+          id: `e-trigger-${a.id}`,
+          source: 'trigger-1',
+          target: a.id,
+          animated: true,
+          style: { stroke: '#a855f7' }
+        });
+        
         setNodes([...currentNodes]); // Force re-render
+        setEdges([...currentEdges]);
         await new Promise(r => setTimeout(r, 800)); // Animation delay
       }
 
@@ -420,27 +431,8 @@ export default function Studio() {
               source: ctxId,
               target: t.id,
               animated: true,
-              style: { stroke: 'var(--success)' }
+              style: { stroke: 'var(--success)', strokeDasharray: '5,5' }
             });
-          });
-        } else if (i === 0) {
-          // Connect the first task to the trigger
-          currentEdges.push({
-            id: `e-trigger-${t.id}`,
-            source: 'trigger-1',
-            target: t.id,
-            animated: true,
-            style: { stroke: '#a855f7' }
-          });
-        } else {
-          // Fallback to sequential chaining: connect this task to the previous task
-          const prevTask = blueprint.tasks[i - 1];
-          currentEdges.push({
-            id: `e-${prevTask.id}-${t.id}`,
-            source: prevTask.id,
-            target: t.id,
-            animated: true,
-            style: { stroke: 'var(--text-secondary)' }
           });
         }
         
