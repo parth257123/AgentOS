@@ -233,7 +233,7 @@ export default function Studio() {
     try {
       const saved = await saveProject({
         id: projectId,
-        name: generationPrompt.replace(/^\[.*?\]\s*/, '') || 'Untitled Project',
+        name: projectTitle || generationPrompt.replace(/^\[.*?\]\s*/, '') || 'Untitled Project',
         nodes,
         edges
       });
@@ -241,6 +241,21 @@ export default function Studio() {
       alert('Project saved successfully!');
     } catch (err) {
       alert('Failed to save project.');
+    }
+  };
+
+  const autoSaveProject = async (title, finalNodes, finalEdges) => {
+    try {
+      const saved = await saveProject({
+        id: projectId,
+        name: title || 'Untitled Project',
+        nodes: finalNodes,
+        edges: finalEdges
+      });
+      setProjectId(saved.id);
+      setGenerationThoughts(prev => [...prev, { type: 'step', text: '✅ Project Auto-Saved to your workspace!' }]);
+    } catch (err) {
+      console.error('Failed to auto-save project', err);
     }
   };
 
@@ -430,6 +445,9 @@ export default function Studio() {
       // Store the title
       setProjectTitle(blueprint.title || promptText.substring(0, 40));
       setGenerationPrompt(`[${blueprint.title}] ${promptText}`);
+      
+      // Auto-save the project so the user doesn't lose their generated DAG
+      await autoSaveProject(blueprint.title, currentNodes, currentEdges);
 
     } catch (err) {
       console.error(err);
