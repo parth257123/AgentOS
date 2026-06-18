@@ -187,25 +187,37 @@ INSTRUCTIONS: The user wants to MODIFY the current workflow. Apply their changes
         title = " ".join(w.capitalize() for w in title_words)
         
         print("\n===JSON_START===")
-        print(json.dumps({
-            "title": f"{title} Crew",
-            "agents": out_agents,
-            "tasks": out_tasks
-        }))
+        if "?" in prompt or any(w in prompt_lower for w in ["what", "how", "why", "explain", "help"]):
+            print(json.dumps({
+                "type": "chat",
+                "message": "I am currently running in basic offline mode without an API key. I can build basic agent workflows, but for conversational assistance and doubt solving, please configure a Gemini or OpenAI API key in your environment variables!"
+            }))
+        else:
+            print(json.dumps({
+                "type": "dag",
+                "title": f"{title} Crew",
+                "agents": out_agents,
+                "tasks": out_tasks
+            }))
         print("===JSON_END===")
         sys.exit(0)
 
     system_prompt = f"""
-You are an expert AI Systems Architect designing autonomous agent workflows (similar to CrewAI).
-The user will provide an objective, request, or modification.
+You are an expert AI Systems Architect and Copilot for AgentOS.
+The user will provide an objective, ask a question, or request a modification to their workflow.
 
 {context_str}
+
+If the user is asking a general question, asking for help, or solving a doubt, set `"type": "chat"` and provide your helpful conversational answer in the `"message"` field. You are an expert at explaining AgentOS, multi-agent systems, and AI concepts.
+If the user is asking you to generate, build, or modify a workflow (agents and tasks), set `"type": "dag"` and populate the `"agents"` and `"tasks"` arrays.
 
 You must return the result as a strict JSON object. Do not include markdown code blocks (no ```json). Output raw valid JSON only.
 
 The JSON schema must be exactly:
 {{
-    "title": "Short catchy name for this project",
+    "type": "chat" | "dag",
+    "message": "Conversational response (only if type is chat)",
+    "title": "Short catchy name for this project (only if type is dag)",
     "agents": [
         {{
             "id": "agent-1", // Must be unique strings

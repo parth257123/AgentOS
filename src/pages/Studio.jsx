@@ -293,15 +293,34 @@ export default function Studio() {
         } catch(e) {}
         throw new Error(errMsg);
       }
-      const data = await res.json();
+      const blueprint = await res.json();
       
-      if (data.error) throw new Error(data.error);
+      if (blueprint.error) throw new Error(blueprint.error);
+
+      if (blueprint.type === 'chat') {
+        setGenerationThoughts(prev => [
+          ...prev.filter(t => t.type !== 'loading'),
+          { type: 'chat', text: blueprint.message }
+        ]);
+        setIsGenerating(false);
+        return;
+      }
 
       // 2. Clear loading state and set initial thought
-      setGenerationThoughts([
-        { type: 'thought', text: `I'll help you create a workflow for your objective: "${promptText}". Let me gather the tools...` }
+      setGenerationThoughts(prev => [
+        ...prev.filter(t => t.type !== 'loading'),
+        { type: 'thought', text: `Designing architecture for: ${blueprint.title || 'New Workflow'}` }
       ]);
-      await new Promise(r => setTimeout(r, 800));
+      
+      // Delay slightly for effect
+      await new Promise(r => setTimeout(r, 600));
+
+      setProjectTitle(blueprint.title || 'Untitled Project');
+
+      // 3. Process Agents sequentially with typing effect
+      let currentY = 100;
+      const newNodes = isFollowUp ? [...nodes] : [];
+      const newEdges = isFollowUp ? [...edges] : [];
 
       let currentNodes = [
         {
@@ -314,8 +333,8 @@ export default function Studio() {
       let currentEdges = [];
 
       // 3. Process Agents sequentially
-      for (let i = 0; i < data.agents.length; i++) {
-        const a = data.agents[i];
+      for (let i = 0; i < (blueprint.agents || []).length; i++) {
+        const a = blueprint.agents[i];
         setGenerationThoughts(prev => [...prev, { type: 'step', text: `Creating Agent: ${a.name}` }]);
         
         const col = i % 4;
@@ -347,8 +366,8 @@ export default function Studio() {
       await new Promise(r => setTimeout(r, 500));
 
       // 4. Process Tasks sequentially
-      for (let i = 0; i < data.tasks.length; i++) {
-        const t = data.tasks[i];
+      for (let i = 0; i < (blueprint.tasks || []).length; i++) {
+        const t = blueprint.tasks[i];
         setGenerationThoughts(prev => [...prev, { type: 'step', text: `Creating Task: ${t.name}` }]);
         
         const col = i % 4;
