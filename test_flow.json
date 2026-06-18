@@ -1,0 +1,18 @@
+{
+  "processType": "hierarchical",
+  "nodes": [
+    {
+      "id": "agent-1",
+      "type": "agent",
+      "data": {"name": "Test Agent", "model": "gemini/gemini-2.5-flash"}
+    },
+    {
+      "id": "task-1",
+      "type": "task",
+      "data": {"description": "Say hello world", "agent_id": "agent-1"}
+    }
+  ],
+  "edges": [
+    {"source": "agent-1", "target": "task-1"}
+  ]
+}

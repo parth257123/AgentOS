@@ -660,7 +660,7 @@ export default function Studio() {
         {/* Canvas */}
         <div style={{ flex: 1, position: 'relative', background: isDarkMode ? '#09090b' : '#f8fafc', transition: 'background 0.3s ease' }}>
           {/* Floating Process Type UI */}
-          <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10, background: isDarkMode ? 'rgba(0,0,0,0.4)' : 'white', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem', width: '180px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+          <div className="nodrag nopan" onMouseDown={e => e.stopPropagation()} style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10, background: isDarkMode ? 'rgba(0,0,0,0.4)' : 'white', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem', width: '180px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
             <div style={{ fontSize: '0.7rem', color: isDarkMode ? 'var(--text-secondary)' : '#64748b', marginBottom: '0.5rem', fontWeight: 500 }}>Version 1</div>
             <div style={{ fontSize: '0.8rem', color: isDarkMode ? 'white' : '#0f172a', fontWeight: 600, marginBottom: '0.25rem' }}>Process Type</div>
             <select 
@@ -674,7 +674,7 @@ export default function Studio() {
           </div>
 
           {/* Floating Toggle Pill */}
-          <div style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', background: isDarkMode ? 'rgba(0,0,0,0.4)' : '#0f172a', border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : 'none', borderRadius: '9999px', padding: '0.25rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
+          <div className="nodrag nopan" onMouseDown={e => e.stopPropagation()} style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', background: isDarkMode ? 'rgba(0,0,0,0.4)' : '#0f172a', border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : 'none', borderRadius: '9999px', padding: '0.25rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
             <div style={{ background: isDarkMode ? '#3b82f6' : 'white', color: isDarkMode ? 'white' : '#0f172a', padding: '0.5rem 2rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>No Code</div>
             <div style={{ color: '#94a3b8', padding: '0.5rem 2rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer' }}>CLI</div>
           </div>
