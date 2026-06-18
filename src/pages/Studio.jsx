@@ -425,11 +425,11 @@ export default function Studio() {
         await new Promise(r => setTimeout(r, 800)); // Animation delay
       }
       
-      setGenerationThoughts(prev => [...prev, { type: 'thought', text: "Perfect! Now let me suggest a project name and review what we've built:" }, { type: 'step', text: `Renaming project to ${data.title}` }]);
+      setGenerationThoughts(prev => [...prev, { type: 'thought', text: "Perfect! Now let me suggest a project name and review what we've built:" }, { type: 'step', text: `Renaming project to ${blueprint.title}` }]);
       
       // Store the title
-      setProjectTitle(data.title || promptText.substring(0, 40));
-      setGenerationPrompt(`[${data.title}] ${promptText}`);
+      setProjectTitle(blueprint.title || promptText.substring(0, 40));
+      setGenerationPrompt(`[${blueprint.title}] ${promptText}`);
 
     } catch (err) {
       console.error(err);
