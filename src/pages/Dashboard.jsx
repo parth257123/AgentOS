@@ -35,22 +35,22 @@ export default function Dashboard() {
 
         {/* Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass-panel hover-lift" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Active Agents</div>
             <div style={{ fontSize: '2rem', fontWeight: 600, color: metrics.totalActive > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>{metrics.totalActive}</div>
             <Users size={40} style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.1 }} />
           </div>
-          <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass-panel hover-lift" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Est. Daily Cost (USD)</div>
             <div style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--accent-primary)' }}>${(metrics.totalActive * 0.42).toFixed(2)}</div>
             <Activity size={40} style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.1, color: 'var(--accent-primary)' }} />
           </div>
-          <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass-panel hover-lift" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Avg Response Time</div>
             <div style={{ fontSize: '2rem', fontWeight: 600 }}>{metrics.avgResponseTime || '1.2s'}</div>
             <Clock size={40} style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.1 }} />
           </div>
-          <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass-panel hover-lift" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>System Status</div>
             <div style={{ fontSize: '2rem', fontWeight: 600, color: metrics.systemStatus === 'Optimal' ? 'var(--success)' : 'var(--warning)' }}>{metrics.systemStatus}</div>
             <Server size={40} style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.1 }} />

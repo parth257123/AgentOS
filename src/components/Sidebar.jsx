@@ -9,21 +9,49 @@ export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const { tenantId, setTenantId } = useTenant();
 
-  const NavLink = ({ to, icon: Icon, label }) => (
-    <Link to={to} style={{ 
-      display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px',
-      background: path === to ? 'rgba(255,255,255,0.1)' : 'transparent',
-      color: path === to ? 'var(--text-primary)' : 'var(--text-secondary)',
-      justifyContent: isExpanded ? 'flex-start' : 'center'
-    }} title={!isExpanded ? label : undefined}>
-      <Icon size={18} /> {isExpanded && label}
-    </Link>
-  );
+  const NavLink = ({ to, icon: Icon, label }) => {
+    const isActive = path === to;
+    return (
+      <Link 
+        to={to} 
+        style={{ 
+          display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px',
+          background: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+          color: isActive ? '#fff' : 'var(--text-secondary)',
+          borderLeft: isActive ? '3px solid var(--accent-primary)' : '3px solid transparent',
+          justifyContent: isExpanded ? 'flex-start' : 'center',
+          transition: 'all 0.2s ease',
+          fontWeight: isActive ? 500 : 400
+        }} 
+        title={!isExpanded ? label : undefined}
+      >
+        <Icon size={18} color={isActive ? 'var(--accent-primary)' : 'currentColor'} /> 
+        {isExpanded && label}
+      </Link>
+    );
+  };
 
   return (
-    <aside className="glass-panel" style={{ width: isExpanded ? '250px' : '80px', transition: 'width 0.3s ease', padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRight: '1px solid var(--border-color)', borderRadius: 0, borderTop: 0, borderBottom: 0, borderLeft: 0, height: '100vh', position: 'sticky', top: 0, overflowX: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: isExpanded ? 'space-between' : 'center', fontWeight: 600, fontSize: '1.25rem' }}>
-        {isExpanded && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Bot color="var(--accent-primary)" /> AgentOS</div>}
+    <aside style={{ 
+      background: 'rgba(10, 10, 10, 0.65)', 
+      backdropFilter: 'blur(24px)',
+      WebkitBackdropFilter: 'blur(24px)',
+      width: isExpanded ? '260px' : '80px', 
+      transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)', 
+      padding: '1.5rem 0.5rem', 
+      display: 'flex', flexDirection: 'column', gap: '2rem', 
+      borderRight: '1px solid var(--border-color)', 
+      height: '100vh', position: 'sticky', top: 0, overflowX: 'hidden' 
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: isExpanded ? 'space-between' : 'center', fontWeight: 600, fontSize: '1.35rem', fontFamily: 'var(--font-heading)', padding: '0 0.5rem' }}>
+        {isExpanded && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div style={{ background: 'linear-gradient(135deg, #60a5fa, #a855f7)', padding: '0.35rem', borderRadius: '8px', display: 'flex' }}>
+              <Bot color="white" size={18} />
+            </div>
+            AgentOS
+          </div>
+        )}
         <button onClick={() => setIsExpanded(!isExpanded)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}>
           <Menu size={20} />
         </button>
