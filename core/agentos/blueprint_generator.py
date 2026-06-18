@@ -229,13 +229,24 @@ The JSON schema must be exactly:
 """
 
     try:
-        response = litellm.completion(
-            model="gemini/gemini-2.5-flash",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ]
-        )
+        response = None
+        models_to_try = ["gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash", "gemini/gemini-pro"]
+        for model_name in models_to_try:
+            try:
+                response = litellm.completion(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                break # Success!
+            except Exception as e:
+                print(f"Model {model_name} failed: {e}", file=sys.stderr)
+                continue
+                
+        if not response:
+            raise Exception("All fallback models failed due to high demand.")
         
         content = response.choices[0].message.content.strip()
         if content.startswith("```json"):
