@@ -91,6 +91,15 @@ function StudioComponent() {
   const [activeExportTab, setActiveExportTab] = useState('crew.py');
   const [projectTitle, setProjectTitle] = useState('Untitled Project');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Auto-fit view when sidebar toggles (wait for CSS transition)
+  useEffect(() => {
+    if (nodes.length > 0) {
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 300); 
+    }
+  }, [isSidebarOpen, fitView, nodes.length]);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isFlightRecorderOpen, setIsFlightRecorderOpen] = useState(false);
   const [smartRouting, setSmartRouting] = useState(false);
