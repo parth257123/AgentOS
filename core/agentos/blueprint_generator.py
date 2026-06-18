@@ -230,7 +230,8 @@ The JSON schema must be exactly:
 
     try:
         response = None
-        models_to_try = ["glm5.2", "gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash"]
+        models_to_try = ["glm5.2", "openai/glm5.2", "gemini/gemini-1.5-flash", "gemini/gemini-1.5-pro"]
+        errors = []
         for model_name in models_to_try:
             try:
                 response = litellm.completion(
@@ -242,11 +243,11 @@ The JSON schema must be exactly:
                 )
                 break # Success!
             except Exception as e:
-                print(f"Model {model_name} failed: {e}", file=sys.stderr)
+                errors.append(f"{model_name}: {str(e)}")
                 continue
                 
         if not response:
-            raise Exception("All fallback models failed due to high demand.")
+            raise Exception("All models failed. Details: " + " | ".join(errors))
         
         content = response.choices[0].message.content.strip()
         if content.startswith("```json"):
