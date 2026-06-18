@@ -877,6 +877,117 @@ def dag():
     
     console.print(bn_table)
 
+# ─────────────────────────────────────────────
+# agentos interact — Interactive Agent REPL
+# ─────────────────────────────────────────────
+@app.command()
+def interact(
+    agent_id: str = typer.Argument(..., help="The ID or Name of the agent to chat with."),
+    tenant_id: str = typer.Option("default_tenant", "--tenant", "-t", help="Tenant ID for tracking context")
+):
+    """💬 Open a live, interactive terminal REPL to chat with your agent."""
+    _print_banner()
+    console.print(f"[bold cyan]Starting Interactive Session with '{agent_id}'...[/bold cyan]\n")
+    
+    sys.path.insert(0, os.getcwd())
+    try:
+        from agents import create_agents
+        agents_dict = create_agents()
+        agent = agents_dict.get(agent_id)
+        if not agent:
+            # Fallback to name search
+            agent = next((a for a in agents_dict.values() if a.name == agent_id), None)
+            
+        if not agent:
+            console.print(f"[bold red]✗ Could not find agent '{agent_id}' in agents.py[/bold red]")
+            raise typer.Exit(1)
+    except ImportError:
+        console.print("[yellow]⚠ No agents.py found in current directory. Creating a blank Agent...[/yellow]")
+        try:
+            from agentos.agent import Agent
+        except ImportError:
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from agentos.agent import Agent
+        agent = Agent(name=agent_id, tenant_id=tenant_id, role="Helpful AI Assistant")
+
+    console.print(f"[bold green]✓ Connected to {agent.name}[/bold green] (Type 'exit' or 'quit' to leave)\n")
+    
+    # Simple REPL loop
+    context = ""
+    while True:
+        try:
+            user_input = Prompt.ask("[bold blue]You[/bold blue]")
+            if user_input.lower() in ['exit', 'quit']:
+                console.print("[dim]Goodbye![/dim]")
+                break
+                
+            with console.status(f"[bold magenta]{agent.name} is thinking...[/bold magenta]", spinner="dots"):
+                result = agent.execute_task(user_input, context)
+            
+            console.print(f"\n[bold magenta]{agent.name}[/bold magenta]:")
+            console.print(Markdown(result))
+            console.print("──────────────────────────────────────────────────\n")
+            
+            context += f"\\nUser: {user_input}\\nAgent: {result}\\n"
+            
+        except KeyboardInterrupt:
+            console.print("\n[dim]Session terminated.[/dim]")
+            break
+        except Exception as e:
+            console.print(f"\n[bold red]✗ Error: {e}[/bold red]\n")
+
+
+# ─────────────────────────────────────────────
+# agentos deploy — Scaffold Deployment Files
+# ─────────────────────────────────────────────
+@app.command()
+def deploy():
+    """🚀 Scaffold production-ready Dockerfile and docker-compose.yml for your agents."""
+    _print_banner()
+    console.print("[bold yellow]⚡ Deployment Scaffold Generator[/bold yellow]\n")
+    
+    dockerfile_content = """# Optimized AgentOS Dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+# Start the AgentOS runner
+CMD ["python", "crew.py"]
+"""
+    
+    docker_compose_content = """version: '3.8'
+services:
+  agent_runner:
+    build: .
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./.agentos_logs:/app/.agentos_logs
+"""
+    
+    with console.status("[bold cyan]Generating deployment assets...[/bold cyan]", spinner="dots"):
+        time.sleep(1) # Simulate scaffolding logic
+        with open("Dockerfile", "w") as f:
+            f.write(dockerfile_content)
+        with open("docker-compose.yml", "w") as f:
+            f.write(docker_compose_content)
+            
+    if not os.path.exists("requirements.txt"):
+        with open("requirements.txt", "w") as f:
+            f.write("agentos\\nlitellm\\n")
+
+    console.print(Panel(
+        "[green]✓ Dockerfile created[/green]\n"
+        "[green]✓ docker-compose.yml created[/green]\n\n"
+        "[bold]Next Steps:[/bold]\n"
+        "1. Add your API keys to a .env file\n"
+        "2. Run [bold cyan]docker-compose up --build[/bold cyan]",
+        title="[bold green]Deployment Ready[/bold green]",
+        border_style="green"
+    ))
+
 
 # ─────────────────────────────────────────────
 # Entry point (used by setup.py)

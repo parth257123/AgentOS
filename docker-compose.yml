@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  agent_runner:
+    build: .
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./.agentos_logs:/app/.agentos_logs
