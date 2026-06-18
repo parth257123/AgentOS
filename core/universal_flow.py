@@ -26,6 +26,7 @@ def run_custom_flow():
 
     nodes = config.get("nodes", [])
     edges = config.get("edges", [])
+    process_type = config.get("processType", "sequential")
 
     agent_instances = {}
     
@@ -119,17 +120,48 @@ def run_custom_flow():
         for tgt in targets:
             chart.append([agent_instances[src], agent_instances[tgt]])
 
-    # Instantiate the Hierarchical Orchestrator
-    mesh_model = agent_instances[entry_point_id].model if entry_point_id else "gemini/gemini-2.5-flash"
-    mesh = Mesh(chart=chart, model=mesh_model)
-    
     # --- EXECUTION ---
+    final_result = ""
     try:
-        final_result = mesh.run(initial_prompt=initial_prompt, max_steps=20)
+        if process_type == "hierarchical":
+            # Instantiate the Hierarchical Orchestrator
+            mesh_model = agent_instances[entry_point_id].model if entry_point_id else "gemini/gemini-2.5-flash"
+            mesh = Mesh(chart=chart, model=mesh_model)
+            final_result = mesh.run(initial_prompt=initial_prompt, max_steps=20)
+        else:
+            # Sequential Execution
+            print("\\n[bold cyan]Starting Sequential Execution...[/bold cyan]")
+            context = ""
+            if task_nodes:
+                for task in task_nodes:
+                    task_id = task["id"]
+                    # Find assigned agent
+                    agent_id = None
+                    for edge in edges:
+                        if edge.get("target") == task_id:
+                            src = edge.get("source")
+                            if src in agent_instances:
+                                agent_id = src
+                                break
+                    
+                    if not agent_id:
+                        # Fallback to entry point
+                        agent_id = entry_point_id
+                        
+                    agent = agent_instances[agent_id]
+                    desc = task["data"].get("description", "")
+                    
+                    result = agent.execute_task(desc, context)
+                    context += f"\\nTask Result: {result}\\n"
+                    final_result = result
+            else:
+                agent = agent_instances[entry_point_id]
+                final_result = agent.execute_task(initial_prompt, "")
+                
     except Exception as e:
-        final_result = f"Mesh Execution Error: {str(e)}"
+        final_result = f"Execution Error: {str(e)}"
         
-    print("\n🚀 CREWAI EXECUTION COMPLETE")
+    print("\\n🚀 AGENTOS EXECUTION COMPLETE")
     print("==================================================")
     print(final_result)
     print("==================================================")

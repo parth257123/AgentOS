@@ -511,9 +511,9 @@ export default function Studio() {
       
       {/* Top Bar (Editor Mode) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 1rem', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid var(--border-color)', zIndex: 10 }}>
-        <div>
-          <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Studio Canvas</h2>
-          <p style={{ color: 'var(--text-secondary)', margin: '0', fontSize: '0.75rem' }}>Visual drag-and-drop workflow builder.</p>
+        <div style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <h2 style={{ fontSize: '1.1rem', margin: 0, display: 'inline-block', marginRight: '0.5rem' }}>Studio Canvas</h2>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Visual drag-and-drop workflow builder.</span>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flex: 1, margin: '0 1.5rem' }}>
           <button 
@@ -524,7 +524,7 @@ export default function Studio() {
             {isSidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {walletBalance !== null && (
             <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, marginRight: '0.5rem' }} title="Your API Credit Balance">
               Wallet: ${walletBalance.toFixed(5)}
