@@ -12,6 +12,7 @@ def generate_crew_code():
     nodes = config.get("nodes", [])
     edges = config.get("edges", [])
     process_type = config.get("processType", "sequential")
+    tenant_id = config.get("tenant_id", "default_tenant")
 
     agents = [n for n in nodes if n.get("type") == "agent"]
     tasks = [n for n in nodes if n.get("type") == "task"]
@@ -80,7 +81,7 @@ def generate_crew_code():
         tasks_yaml += "\n"
 
     # 3. Generate agents.py
-    agents_py = "from crewai import Agent\n\n\ndef create_agents():\n    return {\n"
+    agents_py = "from agentos.agent import Agent\n\n\ndef create_agents():\n    return {\n"
     for a in agents:
         data = a.get("data", {})
         role = data.get("role", "").replace('"', '\\"')
@@ -93,87 +94,73 @@ def generate_crew_code():
             tools_code = repr(tools_list) + "  # Replace with actual tool instances"
 
         agents_py += f'''        "{a['id']}": Agent(
+            name="{data.get('name', safe_id)}",
+            tenant_id="{tenant_id}",
             role="{role}",
             goal="{goal}",
             backstory="{backstory}",
-            llm="{model}",
-            verbose={data.get('verbose', True)},
-            memory={data.get('memory', False)},
-            allow_delegation={data.get('allowDelegation', False)},
+            model="{model}",
             tools={tools_code}
         ),
 '''
     agents_py += "    }\n"
 
     # 4. Generate tasks.py
-    tasks_py = "from crewai import Task\n\n\ndef create_tasks(agents):\n"
-    
-    # We must generate tasks in order or build a dict so they can reference each other.
-    # In CrewAI, context=[task1, task2]. Easiest way is to define a dict of tasks.
-    tasks_py += "    tasks_dict = {}\n\n"
+    tasks_py = "def create_tasks():\n    return [\n"
     
     for t in tasks:
         data = t.get("data", {})
         desc = data.get("description", "").replace('"', '\\"')
         exp_out = data.get("expectedOutput", "").replace('"', '\\"')
         agent_id = find_agent_for_task(t["id"])
-        agent_ref = f'agents["{agent_id}"]' if agent_id else "None"
         
-        ctx = find_context_for_task(t["id"])
-        ctx_list = []
-        for c in ctx:
-            # We assume referenced tasks were already created in the loop, or we just reference the dict
-            ctx_list.append(f'tasks_dict["{c}"]')
-        
-        context_line = ""
-        if ctx_list:
-            context_line = f',\n            context=[{", ".join(ctx_list)}]'
-            
-        output_file_line = ""
-        if data.get("outputFile"):
-            output_file_line = f',\n            output_file="{data["outputFile"]}"'
-            
-        async_line = ""
-        if data.get("asyncExecution"):
-            async_line = ",\n            async_execution=True"
-
         safe_id = t["id"].replace("-", "_")
-        tasks_py += f'''    tasks_dict["{safe_id}"] = Task(
-        description="{desc}",
-        expected_output="{exp_out}",
-        agent={agent_ref}{context_line}{output_file_line}{async_line}
-    )
+        tasks_py += f'''        {{
+            "id": "{safe_id}",
+            "description": "{desc}",
+            "expected_output": "{exp_out}",
+            "agent_id": "{agent_id}"
+        }},
 '''
-    tasks_py += "\n    return list(tasks_dict.values())\n"
+    tasks_py += "    ]\n"
 
-    # 5. Generate crew.py
-    process_import = "Process.sequential" if process_type == "sequential" else "Process.hierarchical"
-    crew_py = f"""from crewai import Crew, Process
+    # 5. Generate crew.py (AgentOS Runner)
+    crew_py = f"""import json
 from agents import create_agents
 from tasks import create_tasks
 
-
 def run_crew():
-    print("Initializing agents and tasks...")
+    print("Initializing AgentOS framework...")
     agents_dict = create_agents()
-    tasks_list = create_tasks(agents_dict)
+    tasks_list = create_tasks()
 
-    agent_instances = list(agents_dict.values())
+    print("Starting AgentOS execution...")
+    results = {{}}
+    
+    for task in tasks_list:
+        agent_id = task["agent_id"]
+        agent = agents_dict.get(agent_id)
+        if not agent:
+            print(f"Skipping task '{{task['id']}}': No assigned agent.")
+            continue
+            
+        print(f"\\n######################")
+        print(f"Running Task: {{task['description'][:50]}}...")
+        print(f"Agent: {{agent.name}} (Role: {{agent.role}})")
+        print(f"######################\\n")
+        
+        # We append context from previous results if needed (naive sequential context)
+        context = json.dumps(results) if results else ""
+        result = agent.execute_task(task["description"], context)
+        results[task["id"]] = result
+        
+        print(f"\\nResult: {{result}}\\n")
 
-    crew = Crew(
-        agents=agent_instances,
-        tasks=tasks_list,
-        process={process_import},
-        verbose=True
-    )
-
-    print("Starting Crew execution...")
-    result = crew.kickoff()
     print("######################")
     print("FINAL RESULT")
     print("######################")
-    print(result)
-
+    if tasks_list:
+        print(results.get(tasks_list[-1]["id"], "No result"))
 
 if __name__ == "__main__":
     run_crew()
@@ -186,7 +173,7 @@ if __name__ == "__main__":
             "tasks.py": tasks_py,
             "agents.yaml": agents_yaml,
             "tasks.yaml": tasks_yaml,
-            "requirements.txt": "crewai\nduckduckgo-search\nlitellm\n"
+            "requirements.txt": "agentos\nlitellm\n"
         }
     }
 

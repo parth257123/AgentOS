@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, TrendingDown, Activity, Server, Zap, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useTenant } from '../context/TenantContext';
 
 export default function Optimize() {
+  const { tenantId } = useTenant();
   const [wallet, setWallet] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,8 +12,8 @@ export default function Optimize() {
     const fetchData = async () => {
       try {
         const [walletRes, analyticsRes] = await Promise.all([
-          fetch('http://localhost:3001/api/wallet').then(res => res.json()),
-          fetch('http://localhost:3001/api/analytics/cost').then(res => res.json())
+          fetch('http://localhost:3001/api/wallet', { headers: { 'X-Tenant-Id': tenantId } }).then(res => res.json()),
+          fetch('http://localhost:3001/api/analytics/cost', { headers: { 'X-Tenant-Id': tenantId } }).then(res => res.json())
         ]);
         setWallet(walletRes);
         setAnalytics(analyticsRes);

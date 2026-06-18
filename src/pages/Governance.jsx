@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Key, Users, Search, Plus, ChevronDown, ChevronRight, Activity, Terminal, User } from 'lucide-react';
+import { useTenant } from '../context/TenantContext';
 
 export default function Governance() {
+  const { tenantId } = useTenant();
   const [activeTab, setActiveTab] = useState('users');
   const [auditLogs, setAuditLogs] = useState([]);
   const [expandedLog, setExpandedLog] = useState(null);
 
   useEffect(() => {
     if (activeTab === 'audit') {
-      fetch('http://localhost:3001/api/audit/logs')
+      fetch('http://localhost:3001/api/audit/logs', { headers: { 'X-Tenant-Id': tenantId } })
         .then(res => res.json())
         .then(data => setAuditLogs(data.logs || []))
         .catch(err => console.error("Failed to load audit logs", err));

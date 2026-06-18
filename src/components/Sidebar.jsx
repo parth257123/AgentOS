@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bot, Home, Activity, Settings, Users, Server, Search, Edit3, BarChart, Menu, ShoppingCart } from 'lucide-react';
+import { Bot, Home, Activity, Settings, Users, Server, Search, Edit3, BarChart, Menu, ShoppingCart, Building } from 'lucide-react';
+import { useTenant } from '../context/TenantContext';
 
 export default function Sidebar() {
   const location = useLocation();
   const path = location.pathname;
   const [isExpanded, setIsExpanded] = useState(true);
+  const { tenantId, setTenantId } = useTenant();
 
   const NavLink = ({ to, icon: Icon, label }) => (
     <Link to={to} style={{ 
@@ -44,7 +46,27 @@ export default function Sidebar() {
         <NavLink to="/dashboard/registry" icon={Server} label="Agent Registry" />
         <NavLink to="/dashboard/settings" icon={Settings} label="Settings" />
       </nav>
-      <div style={{ marginTop: 'auto' }}>
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {isExpanded ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.75rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              <Building size={14} /> Active Tenant
+            </div>
+            <select 
+              value={tenantId} 
+              onChange={(e) => setTenantId(e.target.value)}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.5rem', borderRadius: '4px', fontSize: '0.9rem', outline: 'none' }}
+            >
+              <option value="tenant_A" style={{ background: '#1e293b' }}>Acme Corp (Tenant A)</option>
+              <option value="tenant_B" style={{ background: '#1e293b' }}>Globex Inc (Tenant B)</option>
+              <option value="default_tenant" style={{ background: '#1e293b' }}>Default Workspace</option>
+            </select>
+          </div>
+        ) : (
+          <div style={{ padding: '0.5rem', display: 'flex', justifyContent: 'center', color: 'var(--accent-primary)' }} title={`Active Tenant: ${tenantId}`}>
+            <Building size={20} />
+          </div>
+        )}
         <Link to="/" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: isExpanded ? '0.75rem' : '0.75rem 0' }} title={!isExpanded ? 'Exit to Site' : undefined}>
           <Home size={18} /> {isExpanded && 'Exit to Site'}
         </Link>

@@ -13,9 +13,10 @@ app.use(express.json());
 const db = require('./database');
 const readline = require('readline');
 
-// Middleware to mock a logged-in user
+// Middleware to mock a logged-in user and extract tenant ID
 app.use((req, res, next) => {
   req.user = db.getUser('usr_123');
+  req.tenantId = req.headers['x-tenant-id'] || 'default_tenant';
   next();
 });
 
@@ -27,8 +28,8 @@ app.get('/api/wallet', (req, res) => {
 
 // In-memory database
 let agents = [
-  { id: 'agt-1', name: 'ResearchBot Alpha', owner: 'Alice Smith', status: 'idle', tasks: 142, uptime: '99.9%' },
-  { id: 'agt-2', name: 'ReportGen-Beta', owner: 'Bob Jones', status: 'idle', tasks: 843, uptime: '99.5%' },
+  { id: 'agt-1', name: 'ResearchBot Alpha', owner: 'Alice Smith', status: 'idle', tasks: 142, uptime: '99.9%', tenant: 'tenant_A' },
+  { id: 'agt-2', name: 'ReportGen-Beta', owner: 'Bob Jones', status: 'idle', tasks: 843, uptime: '99.5%', tenant: 'tenant_A' },
 ];
 
 let metrics = {
@@ -38,8 +39,8 @@ let metrics = {
 };
 
 let projects = [
-  { id: 'proj-1', name: 'Real Estate Comp', tag: 'LIVE V3', runs: 53, days: 7, nodes: [], edges: [] },
-  { id: 'proj-2', name: 'Topic Research', tag: '', runs: 0, days: 9, nodes: [], edges: [] }
+  { id: 'proj-1', name: 'Real Estate Comp', tag: 'LIVE V3', runs: 53, days: 7, nodes: [], edges: [], tenant: 'tenant_A' },
+  { id: 'proj-2', name: 'Topic Research', tag: '', runs: 0, days: 9, nodes: [], edges: [], tenant: 'tenant_A' }
 ];
 
 let marketplaceTemplates = [
@@ -93,7 +94,8 @@ let marketplaceTemplates = [
 // --- API Endpoints ---
 
 app.get('/api/projects', (req, res) => {
-  res.json({ projects });
+  const tenantProjects = projects.filter(p => p.tenant === req.tenantId);
+  res.json({ projects: tenantProjects });
 });
 
 // --- Marketplace Endpoints ---
@@ -130,16 +132,14 @@ app.post('/api/marketplace/install/:id', (req, res) => {
 
 // --- Audit Logs Endpoint ---
 app.get('/api/audit/logs', async (req, res) => {
-  const tenantId = req.user ? req.user.id : 'default_tenant';
-  // Use a hardcoded tenant for testing if default isn't populated
-  const targetTenant = 'tenant_A'; // We'll use tenant_A or default_tenant based on what's available
-  
+  const tenantId = req.tenantId;
   const auditDir = path.join(__dirname, '../.agentos_audit');
   let logFile = path.join(auditDir, `${tenantId}.log`);
   
-  // For demo purposes, fallback to a mock file if user's doesn't exist
+  // Create an empty audit log if it doesn't exist
   if (!fs.existsSync(logFile)) {
-    logFile = path.join(auditDir, 'tenant_A.log');
+    if (!fs.existsSync(auditDir)) fs.mkdirSync(auditDir, { recursive: true });
+    fs.writeFileSync(logFile, '');
   }
   if (!fs.existsSync(logFile)) {
       return res.json({ logs: [] });
@@ -335,7 +335,8 @@ app.post('/api/projects', (req, res) => {
       runs: 0,
       days: 0,
       nodes: nodes || [],
-      edges: edges || []
+      edges: edges || [],
+      tenant: req.tenantId
     };
     projects.push(newProject);
     res.status(201).json(newProject);
@@ -343,18 +344,25 @@ app.post('/api/projects', (req, res) => {
 });
 
 app.get('/api/agents', (req, res) => {
-  const activeCount = agents.filter(a => a.status === 'active').length;
-  const status = activeCount > 0 ? 'Optimal' : agents.length === 0 ? 'No Agents' : 'Idle';
-  res.json({ agents, metrics: { ...metrics, totalActive: activeCount, systemStatus: status } });
+  const tenantAgents = agents.filter(a => a.tenant === req.tenantId);
+  res.json({ agents: tenantAgents });
 });
 
 app.post('/api/agents', (req, res) => {
+  const { name, role, goal, backstory, model, tools } = req.body;
   const newAgent = {
-    ...req.body,
     id: `agt-${Date.now()}`,
+    name: name || 'Unnamed Agent',
+    role: role || '',
+    goal: goal || '',
+    backstory: backstory || '',
+    model: model || 'openai/glm5.2',
+    tools: tools || [],
+    owner: req.user ? req.user.name : 'System',
     status: 'idle',
     tasks: 0,
-    uptime: '100%'
+    uptime: '100%',
+    tenant: req.tenantId
   };
   agents.push(newAgent);
   res.status(201).json(newAgent);
@@ -362,14 +370,20 @@ app.post('/api/agents', (req, res) => {
 
 app.delete('/api/agents/:id', (req, res) => {
   const { id } = req.params;
-  agents = agents.filter(a => a.id !== id);
-  res.json({ success: true });
+  const initialLength = agents.length;
+  agents = agents.filter(a => !(a.id === id && a.tenant === req.tenantId));
+  if (agents.length < initialLength) {
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Agent not found' });
+  }
 });
 
 app.put('/api/agents/:id/toggle', (req, res) => {
   const { id } = req.params;
+  const agent = agents.find(a => a.id === id && a.tenant === req.tenantId);
   agents = agents.map(a => {
-    if (a.id === id) {
+    if (a.id === id && a.tenant === req.tenantId) {
       return { ...a, status: a.status === 'active' ? 'idle' : 'active' };
     }
     return a;
@@ -461,7 +475,8 @@ app.post('/api/blueprint/generate', (req, res) => {
 
   const inputConfig = {
     prompt,
-    current_graph: { nodes: nodes || [], edges: edges || [] }
+    current_graph: { nodes: nodes || [], edges: edges || [] },
+    tenant_id: req.tenantId
   };
 
   pythonProcess.stdin.write(JSON.stringify(inputConfig));
@@ -499,7 +514,7 @@ app.post('/api/blueprint/generate', (req, res) => {
 
 // Code Compiler Exporter
 app.post('/api/blueprint/export', (req, res) => {
-  const config = req.body;
+  const config = { ...req.body, tenant_id: req.tenantId };
   const corePath = path.resolve(__dirname, '../core');
   
   const pythonProcess = spawn('python', ['compiler.py'], { cwd: corePath });

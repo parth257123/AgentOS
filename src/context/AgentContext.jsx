@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTenant } from './TenantContext';
 
 const AgentContext = createContext();
 
@@ -16,10 +17,22 @@ export const AgentProvider = ({ children }) => {
   const [flowLogs, setFlowLogs] = useState('');
   const [flowTraces, setFlowTraces] = useState([]);
   const [nodeStates, setNodeStates] = useState({});
+  
+  const { tenantId } = useTenant();
+
+  const apiFetch = (url, options = {}) => {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'X-Tenant-Id': tenantId
+      }
+    });
+  };
 
   const fetchAgents = async () => {
     try {
-      const res = await fetch('/api/agents');
+      const res = await apiFetch('/api/agents');
       const data = await res.json();
       setAgents(data.agents);
       setMetrics(data.metrics);
@@ -30,7 +43,7 @@ export const AgentProvider = ({ children }) => {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('/api/projects');
+      const res = await apiFetch('/api/projects');
       const data = await res.json();
       setProjects(data.projects || []);
     } catch (err) {
@@ -51,7 +64,7 @@ export const AgentProvider = ({ children }) => {
 
   const deployAgent = async (newAgent) => {
     try {
-      await fetch('/api/agents', {
+      await apiFetch('/api/agents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAgent)
@@ -64,7 +77,7 @@ export const AgentProvider = ({ children }) => {
 
   const toggleStatus = async (id) => {
     try {
-      await fetch(`/api/agents/${id}/toggle`, { method: 'PUT' });
+      await apiFetch(`/api/agents/${id}/toggle`, { method: 'PUT' });
       fetchAgents();
     } catch (err) {
       console.error("Toggle failed", err);
@@ -73,7 +86,7 @@ export const AgentProvider = ({ children }) => {
 
   const removeAgent = async (id) => {
     try {
-      await fetch(`/api/agents/${id}`, { method: 'DELETE' });
+      await apiFetch(`/api/agents/${id}`, { method: 'DELETE' });
       fetchAgents();
     } catch (err) {
       console.error("Remove failed", err);
@@ -84,7 +97,7 @@ export const AgentProvider = ({ children }) => {
     try {
       setFlowLogs("Running python framework...\n");
       setFlowTraces([]);
-      const res = await fetch('/api/flows/run', { method: 'POST' });
+      const res = await apiFetch('/api/flows/run', { method: 'POST' });
       const data = await res.json();
       setFlowLogs(data.logs);
       if (data.traces) setFlowTraces(data.traces);
@@ -101,7 +114,7 @@ export const AgentProvider = ({ children }) => {
       setFlowTraces([]);
       setNodeStates({});
 
-      const res = await fetch('http://localhost:3001/api/flows/custom', { 
+      const res = await apiFetch('http://localhost:3001/api/flows/custom', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
@@ -193,7 +206,7 @@ export const AgentProvider = ({ children }) => {
 
   const saveProject = async (projectData) => {
     try {
-      const res = await fetch('/api/projects', {
+      const res = await apiFetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(projectData)

@@ -9,28 +9,31 @@ import Performance from './pages/Performance';
 import Marketplace from './pages/Marketplace';
 import DashboardLayout from './components/DashboardLayout';
 import { AgentProvider } from './context/AgentContext';
+import { TenantProvider } from './context/TenantContext';
 import './App.css';
 
 function App() {
   return (
-    <AgentProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="governance" element={<Governance />} />
-            <Route path="discovery" element={<Discovery />} />
-            <Route path="studio" element={<Studio />} />
-            <Route path="optimize" element={<Optimize />} />
-            <Route path="performance" element={<Performance />} />
-            <Route path="marketplace" element={<Marketplace />} />
-            {/* Fallbacks for other sidebar links */}
-            <Route path="*" element={<div style={{padding: '2rem'}}><h2>Coming Soon</h2><p>This module is under construction.</p></div>} />
-          </Route>
-        </Routes>
-      </Router>
-    </AgentProvider>
+    <TenantProvider>
+      <AgentProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="governance" element={<Governance />} />
+              <Route path="discovery" element={<Discovery />} />
+              <Route path="studio" element={<Studio />} />
+              <Route path="optimize" element={<Optimize />} />
+              <Route path="performance" element={<Performance />} />
+              <Route path="marketplace" element={<Marketplace />} />
+              {/* Fallbacks for other sidebar links */}
+              <Route path="*" element={<div style={{padding: '2rem'}}><h2>Coming Soon</h2><p>This module is under construction.</p></div>} />
+            </Route>
+          </Routes>
+        </Router>
+      </AgentProvider>
+    </TenantProvider>
   );
 }
 

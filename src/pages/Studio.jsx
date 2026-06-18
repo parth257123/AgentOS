@@ -5,6 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon, GitBranch } from 'lucide-react';
 import { AgentNode, TaskNode, TriggerNode } from '../components/CustomNodes';
 import { useAgents } from '../context/AgentContext';
+import { useTenant } from '../context/TenantContext';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -24,6 +25,7 @@ const initialEdges = [
 ];
 
 export default function Studio() {
+  const { tenantId } = useTenant();
   const { runCustomFlow, flowTraces, flowLogs, projects, saveProject, nodeStates } = useAgents();
   const [viewMode, setViewMode] = useState('home'); 
   const [projectId, setProjectId] = useState(null);
@@ -101,11 +103,11 @@ export default function Studio() {
   }, [nodeStates, isDarkMode, setEdges]);
 
   React.useEffect(() => {
-    fetch('http://localhost:3001/api/wallet')
+    fetch('http://localhost:3001/api/wallet', { headers: { 'X-Tenant-Id': tenantId } })
       .then(res => res.json())
       .then(data => setWalletBalance(data.balance))
       .catch(err => console.error("Failed to fetch wallet:", err));
-  }, []);
+  }, [tenantId]);
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
@@ -234,7 +236,7 @@ export default function Studio() {
       // 1. Call Backend API — pass current graph for context-aware editing
       const res = await fetch('http://localhost:3001/api/blueprint/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Tenant-Id': tenantId },
         body: JSON.stringify({ 
           prompt: promptText,
           nodes: isFollowUp ? nodes : [],
@@ -383,7 +385,7 @@ export default function Studio() {
       setGenerationThoughts(prev => [...prev, { type: 'loading', text: 'Compiling python code...' }]);
       const res = await fetch('http://localhost:3001/api/blueprint/export', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Tenant-Id': tenantId },
         body: JSON.stringify({ nodes, edges, processType })
       });
       const data = await res.json();
@@ -552,7 +554,8 @@ export default function Studio() {
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', borderColor: '#a855f7', color: '#a855f7' }} onClick={async () => {
             try {
               const resp = await fetch('http://localhost:3001/api/dag/analyze', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'X-Tenant-Id': tenantId },
                 body: JSON.stringify({ nodes, edges }),
               });
               const data = await resp.json();
