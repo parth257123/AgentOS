@@ -699,23 +699,65 @@ export default function Studio() {
           </div>
           
           <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)' }}>
-            <textarea 
-              data-gramm="false"
-              spellCheck="false"
-              placeholder="Ask, build,... (Shift + Enter for new line)"
-              value={chatInput}
-              onChange={e => setChatInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if(chatInput.trim()) {
-                    generateBlueprintFromText(chatInput);
-                    setChatInput('');
+            <div style={{ 
+              background: isDarkMode ? '#1e293b' : '#f1f5f9', 
+              borderRadius: '20px', 
+              padding: '0.75rem 1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <textarea 
+                data-gramm="false"
+                spellCheck="false"
+                placeholder="Ask, build, or solve doubts..."
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if(chatInput.trim() && !isGenerating) {
+                      generateBlueprintFromText(chatInput);
+                      setChatInput('');
+                    }
                   }
-                }
-              }}
-              style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', outline: 'none', fontSize: '0.9rem', resize: 'none', minHeight: '60px', fontFamily: 'inherit' }}
-            />
+                }}
+                style={{ 
+                  width: '100%', background: 'transparent', border: 'none', color: isDarkMode ? 'white' : '#0f172a', 
+                  outline: 'none', fontSize: '0.9rem', resize: 'none', minHeight: '40px', maxHeight: '150px', fontFamily: 'inherit' 
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <button style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.25rem' }}>
+                  <Mic size={18} />
+                </button>
+                <button 
+                  onClick={() => {
+                    if (isGenerating) {
+                      setIsGenerating(false); // Quick stop override
+                      setGenerationThoughts(prev => [...prev, { type: 'step', text: 'Generation stopped by user.' }]);
+                    } else if (chatInput.trim()) {
+                      generateBlueprintFromText(chatInput);
+                      setChatInput('');
+                    }
+                  }}
+                  style={{ 
+                    background: isGenerating ? '#ef4444' : (chatInput.trim() ? 'var(--accent-primary)' : '#475569'), 
+                    color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: chatInput.trim() || isGenerating ? 'pointer' : 'default',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {isGenerating ? (
+                    <div style={{ width: '12px', height: '12px', background: 'white', borderRadius: '2px' }} />
+                  ) : (
+                    <ArrowRight size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
