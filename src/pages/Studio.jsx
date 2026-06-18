@@ -700,6 +700,8 @@ export default function Studio() {
           
           <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)' }}>
             <textarea 
+              data-gramm="false"
+              spellCheck="false"
               placeholder="Ask, build,... (Shift + Enter for new line)"
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
