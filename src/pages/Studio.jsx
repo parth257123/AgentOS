@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
+import { marked } from 'marked';
 import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon } from 'lucide-react';
+import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon, GitBranch } from 'lucide-react';
 import { AgentNode, TaskNode, TriggerNode } from '../components/CustomNodes';
 import { useAgents } from '../context/AgentContext';
 
@@ -23,7 +24,7 @@ const initialEdges = [
 ];
 
 export default function Studio() {
-  const { runCustomFlow, flowTraces, flowLogs, projects, saveProject } = useAgents();
+  const { runCustomFlow, flowTraces, flowLogs, projects, saveProject, nodeStates } = useAgents();
   const [viewMode, setViewMode] = useState('home'); 
   const [projectId, setProjectId] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -45,8 +46,59 @@ export default function Studio() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isFlightRecorderOpen, setIsFlightRecorderOpen] = useState(false);
   const [smartRouting, setSmartRouting] = useState(false);
+  const [dagAnalysis, setDagAnalysis] = useState(null);
+  const [isDagModalOpen, setIsDagModalOpen] = useState(false);
 
   const [walletBalance, setWalletBalance] = useState(null);
+
+  React.useEffect(() => {
+    // When nodeStates updates, we look through all active node IDs
+    const activeNodes = Object.entries(nodeStates || {})
+      .filter(([_, status]) => status === 'running')
+      .map(([id]) => id);
+
+    setEdges(eds => eds.map(edge => {
+      const isSourceActive = activeNodes.includes(edge.source);
+      const isTargetActive = activeNodes.includes(edge.target);
+      const isActive = isSourceActive || isTargetActive;
+      
+      if (isActive) {
+        const activeNodeId = isSourceActive ? edge.source : edge.target;
+        let strokeColor = 'var(--accent-primary)';
+        if (activeNodeId.includes('agent')) {
+          strokeColor = '#818cf8';
+        } else if (activeNodeId.includes('task')) {
+          strokeColor = '#10b981';
+        } else if (activeNodeId.includes('trigger')) {
+          strokeColor = '#a855f7';
+        }
+
+        return {
+          ...edge,
+          animated: true,
+          style: {
+            ...edge.style,
+            stroke: strokeColor,
+            strokeWidth: 3,
+            filter: `drop-shadow(0 0 6px ${strokeColor})`,
+            transition: 'all 0.3s ease'
+          }
+        };
+      } else {
+        return {
+          ...edge,
+          animated: false,
+          style: {
+            ...edge.style,
+            stroke: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(15, 23, 42, 0.15)',
+            strokeWidth: 1.5,
+            filter: 'none',
+            transition: 'all 0.3s ease'
+          }
+        };
+      }
+    }));
+  }, [nodeStates, isDarkMode, setEdges]);
 
   React.useEffect(() => {
     fetch('http://localhost:3001/api/wallet')
@@ -497,6 +549,17 @@ export default function Studio() {
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addTrigger}><Plus size={14} /> Trigger</button>
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addAgent}><Plus size={14} /> Agent</button>
           <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={addTask}><Plus size={14} /> Task</button>
+          <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', borderColor: '#a855f7', color: '#a855f7' }} onClick={async () => {
+            try {
+              const resp = await fetch('http://localhost:3001/api/dag/analyze', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nodes, edges }),
+              });
+              const data = await resp.json();
+              setDagAnalysis(data);
+              setIsDagModalOpen(true);
+            } catch (e) { console.error('DAG analysis failed', e); }
+          }}><GitBranch size={14} /> Analyze DAG</button>
           {flowTraces && flowTraces.length > 0 && !isFlightRecorderOpen && (
             <button className="btn btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }} onClick={() => setIsFlightRecorderOpen(true)}><Activity size={14} /> View Logs</button>
           )}
@@ -623,6 +686,7 @@ export default function Studio() {
             onPaneClick={() => setSelectedNode(null)}
             nodeTypes={nodeTypes}
             fitView
+            panOnScroll={true}
             theme={isDarkMode ? "dark" : "light"}
           >
             <Background color={isDarkMode ? '#333' : '#cbd5e1'} gap={16} size={1.5} />
@@ -692,6 +756,7 @@ export default function Studio() {
                       <option value="groq/mixtral-8x7b-32768">Mixtral (8x7B)</option>
                     </optgroup>
                     <optgroup label="Local (Ollama)">
+                      <option value="ollama/glm-5.2">GLM 5.2 (Local/Demo)</option>
                       <option value="ollama/llama3">Llama 3 (Local)</option>
                       <option value="ollama/mistral">Mistral (Local)</option>
                     </optgroup>
@@ -774,8 +839,39 @@ export default function Studio() {
                   <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--accent-primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Sparkles size={16} /> Final Output
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
-                    {flowLogs.includes("🚀 CREWAI EXECUTION COMPLETE") ? flowLogs.split("🚀 CREWAI EXECUTION COMPLETE")[1].replace(/={50}/g, '').trim() : flowLogs}
+                  <div>
+                    {(() => {
+                      let cleanText = flowLogs;
+                      if (cleanText.includes("🚀 CREWAI EXECUTION COMPLETE")) {
+                        cleanText = cleanText.split("🚀 CREWAI EXECUTION COMPLETE")[1].replace(/={50}/g, '').trim();
+                      }
+                      
+                      const isMarkdown = cleanText.includes('#') || cleanText.includes('- ') || cleanText.includes('**') || cleanText.includes('`');
+                      if (isMarkdown) {
+                        try {
+                          const htmlContent = marked.parse(cleanText);
+                          return (
+                            <div 
+                              className="markdown-content"
+                              style={{ 
+                                fontSize: '0.9rem', 
+                                color: 'var(--text-primary)', 
+                                lineHeight: '1.6',
+                              }}
+                              dangerouslySetInnerHTML={{ __html: htmlContent }}
+                            />
+                          );
+                        } catch (e) {
+                          console.error("Failed to parse markdown:", e);
+                        }
+                      }
+                      
+                      return (
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                          {cleanText}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -819,6 +915,103 @@ export default function Studio() {
           </div>
         </div>
       )}
+
+      {isDagModalOpen && dagAnalysis && (
+        <DagModal analysis={dagAnalysis} onClose={() => setIsDagModalOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+function DagModal({ analysis, onClose }) {
+  if (!analysis || analysis.status !== 'OK') return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div className="glass-panel" style={{ padding: '2rem', maxWidth: 500 }}>
+        <h3 style={{ color: '#ff5252' }}>DAG Analysis Error</h3>
+        <p>{analysis?.error || 'Unknown error'}</p>
+        <button className="btn btn-secondary" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+
+  const { summary, execution_layers, critical_path, bottlenecks, speedup } = analysis;
+  const speedColor = speedup.speedup_factor >= 2 ? '#00e676' : speedup.speedup_factor >= 1.3 ? '#ffab00' : '#ff5252';
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div className="glass-panel" style={{ padding: '2rem', maxWidth: 700, maxHeight: '85vh', overflowY: 'auto', width: '90%' }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><GitBranch size={20} color="#a855f7" /> DAG Analysis Report</h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={20} /></button>
+        </div>
+
+        {/* Speedup Hero */}
+        <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: 12, marginBottom: '1.5rem', border: `1px solid ${speedColor}33` }}>
+          <div style={{ fontSize: '3rem', fontWeight: 800, color: speedColor }}>{speedup.speedup_factor}x</div>
+          <div style={{ color: 'var(--text-secondary)' }}>Parallelization Speedup</div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1rem', fontSize: '0.85rem' }}>
+            <span>Sequential: <strong>{speedup.sequential_time}s</strong></span>
+            <span>Parallel: <strong style={{ color: speedColor }}>{speedup.parallel_time}s</strong></span>
+            <span>Saved: <strong style={{ color: '#00e676' }}>{speedup.time_saved}s</strong></span>
+          </div>
+        </div>
+
+        {/* Summary Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+          {[['Nodes', summary.total_nodes], ['Layers', summary.total_layers], ['Max ∥', summary.max_parallelism]].map(([label, val]) => (
+            <div key={label} style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: 8, textAlign: 'center', border: '1px solid var(--border-color)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#00f2fe' }}>{val}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Execution Layers */}
+        <h4 style={{ marginBottom: '0.75rem' }}>⚡ Execution Layers</h4>
+        {execution_layers.map(layer => (
+          <div key={layer.layer} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', padding: '0.5rem', background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}>
+            <span style={{ background: layer.can_parallelize ? 'rgba(0,230,118,0.15)' : 'rgba(255,255,255,0.05)', color: layer.can_parallelize ? '#00e676' : 'var(--text-secondary)', padding: '0.2rem 0.5rem', borderRadius: 6, fontSize: '0.75rem', fontWeight: 700, minWidth: 55, textAlign: 'center' }}>
+              L{layer.layer} {layer.can_parallelize ? '∥' : '→'}
+            </span>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {layer.nodes.map(n => (
+                <span key={n.id} style={{ background: n.type === 'agent' ? 'rgba(129,140,248,0.15)' : n.type === 'trigger' ? 'rgba(168,85,247,0.15)' : 'rgba(16,185,129,0.15)', color: n.type === 'agent' ? '#818cf8' : n.type === 'trigger' ? '#a855f7' : '#10b981', padding: '0.2rem 0.5rem', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500 }}>{n.name}</span>
+              ))}
+            </div>
+            <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{layer.layer_duration}s</span>
+          </div>
+        ))}
+
+        {/* Critical Path */}
+        <h4 style={{ margin: '1.25rem 0 0.75rem' }}>🔥 Critical Path ({critical_path.total_duration}s)</h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap', padding: '0.75rem', background: 'rgba(255,82,82,0.05)', borderRadius: 8, border: '1px solid rgba(255,82,82,0.2)' }}>
+          {critical_path.path_names.map((name, i) => (
+            <React.Fragment key={i}>
+              <span style={{ background: 'rgba(255,82,82,0.15)', color: '#ff5252', padding: '0.2rem 0.5rem', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600 }}>{name}</span>
+              {i < critical_path.path_names.length - 1 && <ArrowRight size={12} color="#ff5252" />}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Bottlenecks */}
+        <h4 style={{ margin: '1.25rem 0 0.75rem' }}>🚧 Top Bottlenecks</h4>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+          <thead><tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+            <th style={{ padding: '0.5rem', textAlign: 'left' }}>Node</th>
+            <th style={{ padding: '0.5rem', textAlign: 'right' }}>Downstream</th>
+            <th style={{ padding: '0.5rem', textAlign: 'right' }}>Impact</th>
+          </tr></thead>
+          <tbody>
+            {bottlenecks.map(b => (
+              <tr key={b.node_id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                <td style={{ padding: '0.5rem' }}>{b.name}</td>
+                <td style={{ padding: '0.5rem', textAlign: 'right' }}>{b.downstream_count}</td>
+                <td style={{ padding: '0.5rem', textAlign: 'right', color: b.impact_score > 2 ? '#ff5252' : '#00e676' }}>{b.impact_score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

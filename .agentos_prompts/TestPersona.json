@@ -1,0 +1,34 @@
+{
+    "name": "TestPersona",
+    "versions": [
+        {
+            "version": "v1",
+            "role": "You are v1",
+            "goal": "Test",
+            "backstory": "Test",
+            "updated_at": 1781690562.1330152
+        },
+        {
+            "version": "v2",
+            "role": "You are v2",
+            "goal": "Test",
+            "backstory": "Test",
+            "updated_at": 1781690562.133141
+        },
+        {
+            "version": "v3",
+            "role": "You are v1",
+            "goal": "Test",
+            "backstory": "Test",
+            "updated_at": 1781690876.881223
+        },
+        {
+            "version": "v4",
+            "role": "You are v2",
+            "goal": "Test",
+            "backstory": "Test",
+            "updated_at": 1781690876.881422
+        }
+    ],
+    "latest_version": "v4"
+}

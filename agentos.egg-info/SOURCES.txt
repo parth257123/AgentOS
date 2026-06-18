@@ -1,0 +1,8 @@
+README.md
+setup.py
+agentos.egg-info/PKG-INFO
+agentos.egg-info/SOURCES.txt
+agentos.egg-info/dependency_links.txt
+agentos.egg-info/entry_points.txt
+agentos.egg-info/requires.txt
+agentos.egg-info/top_level.txt

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Bot, Target, Settings2, ChevronDown, Search, Calculator, FileText, Code, Globe, Zap, Clock, Settings } from 'lucide-react';
+import { useAgents } from '../context/AgentContext';
 
 const toolIcons = {
   web_search: { icon: Search, label: 'Search the Internet' },
@@ -10,20 +11,40 @@ const toolIcons = {
   scraper: { icon: Globe, label: 'Web Scraper' }
 };
 
-export const AgentNode = ({ data }) => {
+export const AgentNode = ({ id, data }) => {
+  const { nodeStates } = useAgents();
+  const status = nodeStates?.[id] || 'idle';
   const modelName = data.model ? data.model.split('/').pop() : 'gpt-5.4'; 
   const isDark = data.theme === 'dark';
+
+  let borderStyle = isDark ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid #bfdbfe';
+  let boxShadowStyle = isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.03)';
+  
+  if (status === 'running') {
+    borderStyle = isDark ? '1px solid #818cf8' : '1px solid #3b82f6';
+    boxShadowStyle = isDark ? '0 0 20px rgba(129, 140, 248, 0.6)' : '0 0 20px rgba(59, 130, 246, 0.4)';
+  } else if (status === 'success') {
+    borderStyle = isDark ? '1px solid #10b981' : '1px solid #10b981';
+    boxShadowStyle = isDark ? '0 0 15px rgba(16, 185, 129, 0.4)' : '0 0 15px rgba(16, 185, 129, 0.2)';
+  } else if (status === 'error') {
+    borderStyle = isDark ? '1px solid #ef4444' : '1px solid #ef4444';
+    boxShadowStyle = isDark ? '0 0 15px rgba(239, 68, 68, 0.4)' : '0 0 15px rgba(239, 68, 68, 0.2)';
+  }
   
   return (
-    <div style={{ 
-      background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
-      border: isDark ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid #bfdbfe', 
-      borderRadius: '8px', 
-      width: '280px', 
-      color: isDark ? 'white' : '#0f172a', 
-      boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.03)',
-      overflow: 'hidden'
-    }}>
+    <div 
+      className={`custom-flow-node node-agent ${status === 'running' ? 'node-running-agent' : ''}`}
+      style={{ 
+        background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
+        border: borderStyle, 
+        borderRadius: '8px', 
+        width: '280px', 
+        color: isDark ? 'white' : '#0f172a', 
+        boxShadow: boxShadowStyle,
+        overflow: 'hidden',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <div style={{ padding: '0.75rem 1rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Bot size={16} color={isDark ? "#818cf8" : "#3b82f6"} />
@@ -82,18 +103,39 @@ export const AgentNode = ({ data }) => {
   );
 };
 
-export const TaskNode = ({ data }) => {
+export const TaskNode = ({ id, data }) => {
+  const { nodeStates } = useAgents();
+  const status = nodeStates?.[id] || 'idle';
   const isDark = data.theme === 'dark';
+
+  let borderStyle = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #bfdbfe';
+  let boxShadowStyle = isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.03)';
+  
+  if (status === 'running') {
+    borderStyle = isDark ? '1px solid #34d399' : '1px solid #10b981';
+    boxShadowStyle = isDark ? '0 0 20px rgba(52, 211, 153, 0.6)' : '0 0 20px rgba(16, 185, 129, 0.4)';
+  } else if (status === 'success') {
+    borderStyle = isDark ? '1px solid #10b981' : '1px solid #10b981';
+    boxShadowStyle = isDark ? '0 0 15px rgba(16, 185, 129, 0.4)' : '0 0 15px rgba(16, 185, 129, 0.2)';
+  } else if (status === 'error') {
+    borderStyle = isDark ? '1px solid #ef4444' : '1px solid #ef4444';
+    boxShadowStyle = isDark ? '0 0 15px rgba(239, 68, 68, 0.4)' : '0 0 15px rgba(239, 68, 68, 0.2)';
+  }
+
   return (
-    <div style={{ 
-      background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
-      border: isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #bfdbfe', 
-      borderRadius: '8px', 
-      width: '280px', 
-      color: isDark ? 'white' : '#0f172a', 
-      boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.03)',
-      overflow: 'hidden'
-    }}>
+    <div 
+      className={`custom-flow-node node-task ${status === 'running' ? 'node-running-task' : ''}`}
+      style={{ 
+        background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
+        border: borderStyle, 
+        borderRadius: '8px', 
+        width: '280px', 
+        color: isDark ? 'white' : '#0f172a', 
+        boxShadow: boxShadowStyle,
+        overflow: 'hidden',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <div style={{ padding: '0.75rem 1rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Target size={16} color={isDark ? "#34d399" : "#3b82f6"} />
@@ -122,7 +164,9 @@ export const TaskNode = ({ data }) => {
   );
 };
 
-export const TriggerNode = ({ data }) => {
+export const TriggerNode = ({ id, data }) => {
+  const { nodeStates } = useAgents();
+  const status = nodeStates?.[id] || 'idle';
   const [activeTab, setActiveTab] = React.useState(null);
   const isDark = data.theme === 'dark';
   
@@ -130,16 +174,31 @@ export const TriggerNode = ({ data }) => {
     setActiveTab(activeTab === tab ? null : tab);
   };
 
+  let borderStyle = isDark ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(0,0,0,0.1)';
+  let boxShadowStyle = isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.05)';
+  
+  if (status === 'running') {
+    borderStyle = isDark ? '1px solid #c084fc' : '1px solid #a855f7';
+    boxShadowStyle = isDark ? '0 0 20px rgba(168, 85, 247, 0.6)' : '0 0 20px rgba(168, 85, 247, 0.4)';
+  } else if (status === 'success') {
+    borderStyle = isDark ? '1px solid #10b981' : '1px solid #10b981';
+    boxShadowStyle = isDark ? '0 0 15px rgba(16, 185, 129, 0.4)' : '0 0 15px rgba(16, 185, 129, 0.2)';
+  }
+
   return (
-    <div style={{ 
-      background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
-      border: isDark ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(0,0,0,0.1)', 
-      borderRadius: '8px', 
-      width: '180px', 
-      color: isDark ? 'white' : '#333', 
-      boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.05)',
-      overflow: 'hidden'
-    }}>
+    <div 
+      className={`custom-flow-node node-trigger ${status === 'running' ? 'node-running-trigger' : ''}`}
+      style={{ 
+        background: isDark ? 'rgba(20, 20, 30, 0.95)' : 'white', 
+        border: borderStyle, 
+        borderRadius: '8px', 
+        width: '180px', 
+        color: isDark ? 'white' : '#333', 
+        boxShadow: boxShadowStyle,
+        overflow: 'hidden',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <div style={{ padding: '0.75rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start', borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.05)' }}>
         <div style={{ background: isDark ? 'rgba(168, 85, 247, 0.15)' : '#f1f5f9', padding: '0.35rem', borderRadius: '6px' }}>
           <Settings size={16} color={isDark ? "#a855f7" : "#64748b"} />

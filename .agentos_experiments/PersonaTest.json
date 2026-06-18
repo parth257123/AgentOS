@@ -1,0 +1,75 @@
+{
+    "name": "PersonaTest",
+    "logs": [
+        {
+            "timestamp": 1781690878.38814,
+            "variant": "v1",
+            "latency": 1.5061922073364258,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690879.892847,
+            "variant": "v2",
+            "latency": 1.5031991004943848,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690881.3953578,
+            "variant": "v2",
+            "latency": 1.5015008449554443,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690882.9035141,
+            "variant": "v1",
+            "latency": 1.5062878131866455,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690884.409846,
+            "variant": "v2",
+            "latency": 1.5048911571502686,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690885.9163342,
+            "variant": "v2",
+            "latency": 1.5027079582214355,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690887.426239,
+            "variant": "v2",
+            "latency": 1.5065579414367676,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690888.935104,
+            "variant": "v2",
+            "latency": 1.5065791606903076,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690890.4452732,
+            "variant": "v2",
+            "latency": 1.50807523727417,
+            "cost": 0.0,
+            "success": true
+        },
+        {
+            "timestamp": 1781690891.9553869,
+            "variant": "v1",
+            "latency": 1.5079102516174316,
+            "cost": 0.0,
+            "success": true
+        }
+    ]
+}

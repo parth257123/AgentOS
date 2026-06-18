@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: agentos
+Version: 1.0.0
+Summary: AgentOS — The Operating System for Autonomous AI Agents
+Author: AgentOS Team
+Requires-Python: >=3.10
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: litellm
+Requires-Dist: pyyaml

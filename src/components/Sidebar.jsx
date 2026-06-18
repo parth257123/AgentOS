@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bot, Home, Activity, Settings, Users, Server, Search, Edit3, BarChart, Menu } from 'lucide-react';
+import { Bot, Home, Activity, Settings, Users, Server, Search, Edit3, BarChart, Menu, ShoppingCart } from 'lucide-react';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -33,6 +33,8 @@ export default function Sidebar() {
         <NavLink to="/dashboard" icon={Activity} label="Control Plane" />
         <NavLink to="/dashboard/discovery" icon={Search} label="Discovery Hub" />
         <NavLink to="/dashboard/studio" icon={Edit3} label="Studio Canvas" />
+        <NavLink to="/dashboard/performance" icon={BarChart} label="Performance" />
+        <NavLink to="/dashboard/marketplace" icon={ShoppingCart} label="Template Store" />
         
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', marginTop: '1rem', textAlign: isExpanded ? 'left' : 'center' }}>
           {isExpanded ? 'Enterprise' : '---'}

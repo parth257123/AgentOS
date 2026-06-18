@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { Shield, Key, Users, Search, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Key, Users, Search, Plus, ChevronDown, ChevronRight, Activity, Terminal, User } from 'lucide-react';
 
 export default function Governance() {
   const [activeTab, setActiveTab] = useState('users');
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [expandedLog, setExpandedLog] = useState(null);
+
+  useEffect(() => {
+    if (activeTab === 'audit') {
+      fetch('http://localhost:3001/api/audit/logs')
+        .then(res => res.json())
+        .then(data => setAuditLogs(data.logs || []))
+        .catch(err => console.error("Failed to load audit logs", err));
+    }
+  }, [activeTab]);
 
   const users = [
     { name: 'Alice Smith', email: 'alice@company.com', role: 'Admin', status: 'Active' },
@@ -76,10 +87,67 @@ export default function Governance() {
       )}
 
       {activeTab === 'audit' && (
-        <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <Shield size={48} style={{ opacity: 0.5, marginBottom: '1rem' }} />
-          <h3>Immutable Audit Logs</h3>
-          <p>This workspace is configured with 30-day log retention.</p>
+        <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Shield size={20} color="var(--accent-primary)"/> Immutable Audit Logs</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>30-day retention</span>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-secondary)' }}>
+                <th style={{ padding: '1rem', fontWeight: 500, width: '40px' }}></th>
+                <th style={{ padding: '1rem', fontWeight: 500 }}>Time</th>
+                <th style={{ padding: '1rem', fontWeight: 500 }}>Actor</th>
+                <th style={{ padding: '1rem', fontWeight: 500 }}>Action</th>
+                <th style={{ padding: '1rem', fontWeight: 500 }}>Resource</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditLogs.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No audit logs found.</td>
+                </tr>
+              ) : auditLogs.map((log, idx) => {
+                const isExpanded = expandedLog === idx;
+                const date = new Date(log.timestamp).toLocaleString();
+                
+                let ActorIcon = User;
+                let actorColor = '#00e676';
+                if (log.actor === 'Agent') { ActorIcon = Terminal; actorColor = '#00f2fe'; }
+                if (log.actor === 'System') { ActorIcon = Activity; actorColor = '#ff5252'; }
+
+                return (
+                  <React.Fragment key={idx}>
+                    <tr style={{ borderBottom: isExpanded ? 'none' : '1px solid var(--border-color)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }} onClick={() => setExpandedLog(isExpanded ? null : idx)}>
+                      <td style={{ padding: '1rem' }}>
+                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                      </td>
+                      <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{date}</td>
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <ActorIcon size={14} color={actorColor} />
+                          <span style={{ color: actorColor, fontWeight: 500 }}>{log.actor}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1rem', fontWeight: 600 }}>{log.action}</td>
+                      <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{log.resource}</td>
+                    </tr>
+                    {isExpanded && (
+                      <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)' }}>
+                        <td colSpan="5" style={{ padding: '1rem 1rem 1.5rem 3.5rem' }}>
+                          <div style={{ background: '#111', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <pre style={{ margin: 0, color: '#00f2fe', fontFamily: 'monospace', fontSize: '0.85rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                              {JSON.stringify(log.details, null, 2)}
+                            </pre>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

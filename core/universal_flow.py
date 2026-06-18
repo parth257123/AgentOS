@@ -6,7 +6,11 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Import the fully integrated AgentOS core engines
-from agentos import Agent, Task, Mesh, CustomRule, BaseTool
+from agentos import (
+    Agent, Task, Mesh, CustomRule, BaseTool,
+    RegexMatchRule, MarkdownCodeBlockRule, RequiredWordsRule,
+    ForbiddenWordsRule, ValidPythonCodeRule, NoPIIRule
+)
 
 load_dotenv()
 
@@ -44,7 +48,27 @@ def run_custom_flow():
             rules = []
             if data.get("verification_rules"):
                 for r in data["verification_rules"]:
-                    rules.append(CustomRule(condition=r.get("condition"), error_msg=r.get("error_msg")))
+                    cond = r.get("condition", "").lower().strip()
+                    err = r.get("error_msg", "")
+                    
+                    if cond == "no syntax errors":
+                        rules.append(ValidPythonCodeRule())
+                    elif cond == "no pii":
+                        rules.append(NoPIIRule())
+                    elif cond.startswith("must contain "):
+                        word = r.get("condition").replace("must contain ", "").strip()
+                        rules.append(RequiredWordsRule([word]))
+                    elif cond.startswith("cannot contain "):
+                        word = r.get("condition").replace("cannot contain ", "").strip()
+                        rules.append(ForbiddenWordsRule([word]))
+                    elif cond.startswith("regex "):
+                        pattern = r.get("condition").replace("regex ", "").strip()
+                        rules.append(RegexMatchRule(pattern, err))
+                    elif cond.startswith("markdown "):
+                        lang = cond.replace("markdown ", "").strip()
+                        rules.append(MarkdownCodeBlockRule(lang))
+                    else:
+                        rules.append(CustomRule(condition=r.get("condition"), error_msg=err))
             
             # Create Agent with all engines fully integrated
             agent = Agent(
@@ -52,11 +76,12 @@ def run_custom_flow():
                 role=data.get("role", "Assistant"),
                 goal=data.get("goal", "Help the user"),
                 backstory=data.get("backstory", "You are an AI assistant."),
-                model="gemini/gemini-2.5-flash",
+                model=data.get("model", "gemini/gemini-2.5-flash"),
                 enable_reflection=True, # Enforced by default for dashboard
                 verification_rules=rules,
                 max_budget=1.00 # Default $1 budget
             )
+            agent.node_id = node["id"]
             agent_instances[node["id"]] = agent
 
     if not agent_instances:
@@ -95,13 +120,19 @@ def run_custom_flow():
             chart.append([agent_instances[src], agent_instances[tgt]])
 
     # Instantiate the Hierarchical Orchestrator
-    mesh = Mesh(chart=chart, model="gemini/gemini-2.5-flash")
+    mesh_model = agent_instances[entry_point_id].model if entry_point_id else "gemini/gemini-2.5-flash"
+    mesh = Mesh(chart=chart, model=mesh_model)
     
     # --- EXECUTION ---
     try:
         final_result = mesh.run(initial_prompt=initial_prompt, max_steps=20)
     except Exception as e:
         final_result = f"Mesh Execution Error: {str(e)}"
+        
+    print("\n🚀 CREWAI EXECUTION COMPLETE")
+    print("==================================================")
+    print(final_result)
+    print("==================================================")
         
     # Combine traces from all agents for the dashboard UI
     all_traces = []
@@ -129,7 +160,7 @@ def run_custom_flow():
             "current_tokens": total_tokens_across_agents,
             "cost_usd": total_cost_usd,
             "prompt_preview": "Context Health Update",
-            "response_preview": f"Total context tokens: ~{total_tokens_across_agents}. Status: {status}\nFinal Output:\n{final_result[:500]}..."
+            "response_preview": f"Total context tokens: ~{total_tokens_across_agents}. Status: {status}\nFinal Output:\n{str(final_result)[:500]}..."
         })
 
     print("\n===JSON_START===")

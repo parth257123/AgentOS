@@ -8,11 +8,12 @@ class TelemetryLogger:
     Flight Recorder implementation: Tracks granular metrics for all LLM calls.
     Addresses Problem 3: Difficult Debugging and Problem 11: Performance Metrics.
     """
-    def __init__(self):
+    def __init__(self, tenant_id: str = "default_tenant"):
+        self.tenant_id = tenant_id
         self.traces = []
         self._active_calls = {}
 
-    def trace_call(self, agent_name: str, prompt: str):
+    def trace_call(self, agent_name: str, prompt: str, node_id: str = None):
         call_id = str(uuid.uuid4())
         self._active_calls[agent_name] = {
             "id": call_id,
@@ -20,16 +21,20 @@ class TelemetryLogger:
         }
         
         # In a real environment, we would securely log or mask sensitive PII here
-        self.traces.append({
+        trace_data = {
             "id": call_id,
+            "tenant_id": self.tenant_id,
             "timestamp": datetime.datetime.now().isoformat(),
             "event": "LLM_CALL_START",
             "agent": agent_name,
+            "node_id": node_id,
             "prompt_full": prompt, # Log full prompt for flight recorder
             "prompt_preview": prompt[:100] + "..." if len(prompt) > 100 else prompt
-        })
+        }
+        self.traces.append(trace_data)
+        print(f"===STREAM_EVENT==={json.dumps(trace_data)}", flush=True)
 
-    def trace_response(self, agent_name: str, response: str, model_used: str = "unknown", prompt_tokens: int = 0, completion_tokens: int = 0, total_tokens: int = 0):
+    def trace_response(self, agent_name: str, response: str, model_used: str = "unknown", prompt_tokens: int = 0, completion_tokens: int = 0, total_tokens: int = 0, node_id: str = None):
         if agent_name in self._active_calls:
             call_data = self._active_calls.pop(agent_name)
             latency = time.time() - call_data["start_time"]
@@ -66,11 +71,13 @@ class TelemetryLogger:
         # SAAS MARKUP: Platform owner charges 3x the base cost
         platform_fee = estimated_cost * 3.0
 
-        self.traces.append({
+        trace_data = {
             "id": call_id,
+            "tenant_id": self.tenant_id,
             "timestamp": datetime.datetime.now().isoformat(),
             "event": "LLM_CALL_END",
             "agent": agent_name,
+            "node_id": node_id,
             "model": model_used,
             "latency_seconds": round(latency, 3),
             "tokens": total_tokens,
@@ -80,11 +87,14 @@ class TelemetryLogger:
             "cost_usd": round(platform_fee, 6), # We rename this to keep UI compatibility if UI expects cost_usd
             "response_full": response,
             "response_preview": response[:100] + "..." if len(response) > 100 else response
-        })
+        }
+        self.traces.append(trace_data)
+        print(f"===STREAM_EVENT==={json.dumps(trace_data)}", flush=True)
         
     def trace_tool(self, agent_name: str, tool_name: str, arguments: dict):
         self.traces.append({
             "id": str(uuid.uuid4()),
+            "tenant_id": self.tenant_id,
             "timestamp": datetime.datetime.now().isoformat(),
             "event": "TOOL_CALL",
             "agent": agent_name,

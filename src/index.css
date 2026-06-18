@@ -111,3 +111,103 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
+
+/* Real-Time Node Execution Animations */
+@keyframes agent-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.4), inset 0 0 8px rgba(129, 140, 248, 0.2);
+    border-color: rgba(129, 140, 248, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(129, 140, 248, 0.9), inset 0 0 15px rgba(129, 140, 248, 0.5);
+    border-color: rgba(129, 140, 248, 1);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.4), inset 0 0 8px rgba(129, 140, 248, 0.2);
+    border-color: rgba(129, 140, 248, 0.6);
+  }
+}
+
+@keyframes task-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.4), inset 0 0 8px rgba(52, 211, 153, 0.2);
+    border-color: rgba(52, 211, 153, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.9), inset 0 0 15px rgba(52, 211, 153, 0.5);
+    border-color: rgba(52, 211, 153, 1);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.4), inset 0 0 8px rgba(52, 211, 153, 0.2);
+    border-color: rgba(52, 211, 153, 0.6);
+  }
+}
+
+@keyframes trigger-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), inset 0 0 8px rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.9), inset 0 0 15px rgba(168, 85, 247, 0.5);
+    border-color: rgba(168, 85, 247, 1);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), inset 0 0 8px rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+}
+
+.node-running-agent {
+  animation: agent-pulse 1.5s infinite ease-in-out !important;
+}
+
+.node-running-task {
+  animation: task-pulse 1.5s infinite ease-in-out !important;
+}
+
+.node-running-trigger {
+  animation: trigger-pulse 1.5s infinite ease-in-out !important;
+}
+
+/* React Flow Connection Line / Edge Animation Override */
+.react-flow__edge.animated path.react-flow__edge-path {
+  stroke-dasharray: 6 6 !important;
+  animation: react-flow__dashoffset 0.6s linear infinite !important;
+}
+
+/* Premium Markdown Output Styling */
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  color: var(--accent-primary);
+  margin-top: 1.2rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.markdown-content h1 { font-size: 1.3rem; }
+.markdown-content h2 { font-size: 1.15rem; }
+.markdown-content h3 { font-size: 1.05rem; }
+.markdown-content p {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+.markdown-content ul, .markdown-content ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.8rem;
+}
+.markdown-content li {
+  margin-bottom: 0.3rem;
+}
+.markdown-content blockquote {
+  border-left: 3px solid var(--accent-primary);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.5rem 1rem;
+  margin: 0.8rem 0;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+}
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-family: monospace;
+}

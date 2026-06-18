@@ -43,6 +43,17 @@ class Mesh:
 
     def _auto_generate_connections(self, agents: list):
         print("[Mesh] AutoMeshRouter activated. Calculating optimal hierarchy...")
+        if "glm-5.2" in self.model or "glm5.2" in self.model:
+            print("[Mesh] AutoMeshRouter offline fallback triggered: GLM-5.2 Demo Mode")
+            for i in range(len(agents)-1):
+                src_name = agents[i].name
+                tgt_name = agents[i+1].name
+                if src_name not in self.connections:
+                    self.connections[src_name] = []
+                self.connections[src_name].append(tgt_name)
+            print(f"[Mesh] Fallback Connections established: {self.connections}")
+            return
+
         import litellm
         import json
         
@@ -94,6 +105,7 @@ class Mesh:
         
         step_count = 0
         call_stack = [] # Tracks who delegated to whom to bubble results back up
+        history = [] # Tracks execution trace for loop detection
         
         while step_count < max_steps:
             allowed_targets = self.connections.get(current_agent.name, [])
@@ -102,6 +114,31 @@ class Mesh:
             response = current_agent.execute_mesh_step(prompt, allowed_targets)
             
             action = response.get("action", "complete")
+            target_name = response.get("target") if action == "delegate" else None
+            
+            history.append((current_agent.name, action, target_name))
+            
+            # --- Enhanced Global Cycle Detection ---
+            cycle_detected = False
+            hist_len = len(history)
+            # Look for repeating sub-sequences of length 1 to N
+            for seq_len in range(1, hist_len // 2 + 1):
+                seq1 = history[hist_len - seq_len : hist_len]
+                seq2 = history[hist_len - 2 * seq_len : hist_len - seq_len]
+                
+                # Check if sequences match exactly AND they involve delegation
+                if seq1 == seq2 and any(x[1] == "delegate" for x in seq1):
+                    cycle_detected = True
+                    break
+                    
+            if cycle_detected:
+                print(f"[MESH ERROR] Infinite Routing Cycle Detected! Breaking loop at {current_agent.name}.")
+                prompt = "SYSTEM CRITICAL WARNING: You are caught in an infinite delegation loop. You MUST STOP delegating the exact same tasks. Analyze the previous results, formulate a final answer, and return a 'complete' action IMMEDIATELY."
+                step_count += 1
+                # Remove the cyclic addition so we don't trip it continuously on the retry
+                history.pop() 
+                continue
+            # ---------------------------------------
             
             if action == "delegate":
                 target_name = response.get("target")

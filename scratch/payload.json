@@ -1,31 +1,21 @@
 {
-  "prompt": "Test the mesh.",
+  "prompt": "Write a python script that prints Hello World.",
   "nodes": [
     {
       "id": "agent-1",
       "type": "agent",
       "data": {
-        "name": "Manager",
-        "role": "Coordinator",
-        "goal": "Manage",
-        "backstory": "You manage things."
-      }
-    },
-    {
-      "id": "agent-2",
-      "type": "agent",
-      "data": {
-        "name": "Worker",
-        "role": "Executor",
-        "goal": "Execute",
-        "backstory": "You do things."
+        "name": "Developer",
+        "role": "Engineer",
+        "goal": "Write code",
+        "backstory": "You write code.",
+        "verification_rules": [
+          {"condition": "no syntax errors", "error_msg": "Fix syntax errors"},
+          {"condition": "markdown python", "error_msg": "Wrap in python code block"},
+          {"condition": "cannot contain java", "error_msg": "Do not write java"}
+        ]
       }
     }
   ],
-  "edges": [
-    {
-      "source": "agent-1",
-      "target": "agent-2"
-    }
-  ]
+  "edges": []
 }

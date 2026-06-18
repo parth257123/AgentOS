@@ -3,15 +3,16 @@ import os
 from typing import List, Dict, Any
 
 class MemoryTier:
-    def __init__(self, agent_name: str, archive_path: str = "./memory_archive"):
+    def __init__(self, agent_name: str, tenant_id: str = "default_tenant", archive_path: str = "./memory_archive"):
         """
         Manages Working Memory (short-term) and Archival Memory (long-term).
         """
         self.agent_name = agent_name
+        self.tenant_id = tenant_id
         self.working_memory: List[Dict[str, str]] = []
         
         # Archival memory path
-        self.archive_path = archive_path
+        self.archive_path = os.path.join(archive_path, self.tenant_id)
         os.makedirs(self.archive_path, exist_ok=True)
         self.archive_file = os.path.join(self.archive_path, f"{self.agent_name}_archive.json")
         self._load_archive()

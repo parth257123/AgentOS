@@ -1,0 +1,20 @@
+{
+    "name": "Sales",
+    "versions": [
+        {
+            "version": "v1",
+            "role": "Tenant A Sales Role",
+            "goal": "Sell for A",
+            "backstory": "Backstory A",
+            "updated_at": 1781692717.362666
+        },
+        {
+            "version": "v2",
+            "role": "Tenant A Sales Role V2",
+            "goal": "Sell for A",
+            "backstory": "Backstory A",
+            "updated_at": 1781692717.3627992
+        }
+    ],
+    "latest_version": "v2"
+}

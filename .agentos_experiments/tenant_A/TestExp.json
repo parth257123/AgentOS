@@ -1,0 +1,12 @@
+{
+    "name": "TestExp",
+    "logs": [
+        {
+            "timestamp": 1781692718.870325,
+            "variant": "v2",
+            "latency": 1.5069618225097656,
+            "cost": 0.0,
+            "success": true
+        }
+    ]
+}
