@@ -230,7 +230,7 @@ The JSON schema must be exactly:
 
     try:
         response = None
-        models_to_try = ["gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash", "gemini/gemini-pro"]
+        models_to_try = ["glm5.2", "gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash"]
         for model_name in models_to_try:
             try:
                 response = litellm.completion(
