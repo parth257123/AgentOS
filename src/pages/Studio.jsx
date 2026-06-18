@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { marked } from 'marked';
+import dagre from 'dagre';
 import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Play, Plus, BookTemplate, Save, Sparkles, Search, Mic, ArrowRight, Activity, Clock, BarChart2, X, ChevronDown, ChevronRight, Cpu, Wrench, Download, PanelLeftClose, PanelLeftOpen, Sun, Moon, GitBranch } from 'lucide-react';
@@ -24,6 +25,36 @@ const initialEdges = [
   { id: 'e1-2', source: 'agent-1', target: 'task-1', animated: true, style: { stroke: 'var(--accent-primary)' } }
 ];
 
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const getLayoutedElements = (nodes, edges, direction = 'LR') => {
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 100, nodesep: 80 });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: 300, height: 200 }); // Estimate node size
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  const newNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    return {
+      ...node,
+      position: {
+        x: nodeWithPosition.x - 300 / 2,
+        y: nodeWithPosition.y - 200 / 2,
+      },
+    };
+  });
+
+  return { nodes: newNodes, edges };
+};
+
 export default function Studio() {
   const { tenantId } = useTenant();
   const { runCustomFlow, flowTraces, flowLogs, projects, saveProject, nodeStates } = useAgents();
@@ -31,8 +62,18 @@ export default function Studio() {
   const [projectId, setProjectId] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [isRunning, setIsRunning] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [processType, setProcessType] = useState('sequential');
+
+  // Auto-layout when processType changes
+  useEffect(() => {
+    if (nodes.length > 0) {
+      const direction = processType === 'hierarchical' ? 'TB' : 'LR';
+      const layouted = getLayoutedElements(nodes, edges, direction);
+      setNodes(layouted.nodes);
+      setEdges(layouted.edges);
+    }
+  }, [processType]); // Only trigger when processType changes
   const [nlPrompt, setNlPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
